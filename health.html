@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LLAS體力計算機 </title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="box">
+        <p>輸入你的體力</p>
+        <input type="text" id="val" value=""> <button class="click">輸入</button>
+        <p>by：MiunaPA</p>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $(".click").click(function() {
+                var health = parseInt($("#val").val(), 10)
+                var plus = (100 - health) * 3 * 60 * 1000;
+                var date = new Date();
+                date.setTime((new Date).getTime() + plus);
+                var text = "";
+                if ((date.getMonth() + 1) < 10) {
+                    text += "0" + date.getMonth() + 1 + "/";
+                } else {
+                    text += date.getMonth() + 1 + "/";
+                }
+                if ((date.getDay()) < 10) {
+                    text += "0" + (date.getDay() - 1) + " ";
+                } else {
+                    text += (date.getDay() - 1) + " ";
+                }
+                if ((date.getHours()) < 10) {
+                    text += "0" + date.getHours() + ":";
+                } else {
+                    text += date.getHours() + ":";
+                }
+                if ((date.getMinutes()) < 10) {
+                    text += "0" + date.getMinutes() + "";
+                } else {
+                    text += date.getMinutes() + "";
+                }
+                alert("滿體時間：" + text)
+            })
+        });
+    </script>
+</body>
+
+</html>
