@@ -8,15 +8,21 @@
 
 <body>
     <div class="box">
-        <p>輸入你的體力</p>
-        <input type="text" id="val" value=""> <button class="click">輸入</button>
+        <p>體力: <input type="text" id="val" value=""> <button class="click">輸入</button></p>
+        <p>回復: <input type="text" id="claim" value=""> </p>
         <p>by：MiunaPA</p>
     </div>
     <script>
         $(document).ready(function() {
             $(".click").click(function() {
+                var claim;
+                if (isNaN(parseInt($("#claim").val()))) {
+                    claim = 100
+                } else {
+                    claim = parseInt($("#claim").val())
+                }
                 var health = parseInt($("#val").val(), 10)
-                var plus = (100 - health) * 3 * 60 * 1000;
+                var plus = (claim - health) * 3 * 60 * 1000;
                 var date = new Date();
                 date.setTime((new Date).getTime() + plus);
                 var text = "";
@@ -40,7 +46,7 @@
                 } else {
                     text += date.getMinutes() + "";
                 }
-                alert("滿體時間：" + text)
+                alert("回復至 " + claim + "：" + text)
             })
         });
     </script>
