@@ -77,7 +77,7 @@
             <input type="text" id="val" placeholder="現在體力">
         </div>
         <div class="textbox">
-            <input type="text" id="claim" placeholder="回復目標(預設100)">
+            <input type="text" id="claim" placeholder="回復目標(預設100 4min)">
         </div>
         <input type="button" class="btn" value="計算" onclick="run()">
     </div>
@@ -93,7 +93,7 @@
                 alert("現在體力輸入錯誤")
             } else {
                 health = parseInt($("#val").val(), 10)
-                var plus = (claim - health) * 3 * 60 * 1000;
+                var plus = (claim - health) * 4 * 60 * 1000;
                 var date = new Date();
                 date.setTime((new Date).getTime() + plus);
                 var text = "";
