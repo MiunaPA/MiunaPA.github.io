@@ -1,7 +1,3805 @@
 <!DOCTYPE html>
+<html lang="zh-Hant">
 <head>
-    <title>MiunaPA</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a7d5a">
+<title>大阪行程 2026/06</title>
+<style>
+:root{
+  --bg:#ffffff; --fg:#1d2125; --muted:#5b6770; --line:#e3e8ec;
+  --card:#f6f8f9; --accent:#0a7d5a; --accent-soft:#e1f3ec; --code:#f0f2f4;
+}
+html.dark{
+  --bg:#14181b; --fg:#e6eaed; --muted:#9aa6ae; --line:#2a3137;
+  --card:#1c2227; --accent:#3ecf9a; --accent-soft:#16302a; --code:#1c2227;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  font-size:16.5px; line-height:1.7; -webkit-text-size-adjust:100%;
+}
+header.bar{
+  position:sticky; top:0; z-index:50; background:var(--bg);
+  border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px;
+  padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top));
+}
+.bar h1{font-size:17px; margin:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.bar button{
+  background:var(--card); color:var(--fg); border:1px solid var(--line);
+  border-radius:9px; padding:7px 11px; font-size:15px; cursor:pointer;
+}
+.bar button:active{background:var(--accent-soft)}
+nav{
+  position:fixed; inset:0 0 0 auto; width:min(80%,320px); background:var(--bg);
+  border-left:1px solid var(--line); transform:translateX(100%);
+  transition:transform .22s ease; z-index:60; overflow-y:auto;
+  padding:14px 14px calc(24px + env(safe-area-inset-bottom));
+  padding-top:calc(14px + env(safe-area-inset-top));
+}
+nav.open{transform:translateX(0)}
+.scrim{position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:55; display:none}
+.scrim.open{display:block}
+nav .grp{font-size:12px; letter-spacing:.08em; color:var(--muted);
+  text-transform:uppercase; margin:16px 4px 6px}
+nav a{display:block; color:var(--fg); text-decoration:none; padding:10px 12px;
+  border-radius:9px; font-size:15.5px}
+nav a:active{background:var(--accent-soft)}
+nav a.today{background:var(--accent-soft); color:var(--accent); font-weight:600}
+main{max-width:780px; margin:0 auto; padding:6px 16px 120px}
+section{border-bottom:1px solid var(--line); padding:18px 0 8px; scroll-margin-top:64px}
+section:last-child{border-bottom:0}
+h1,h2,h3,h4{line-height:1.35; margin:1.3em 0 .5em}
+section>h1:first-child{font-size:23px; margin-top:.2em}
+h2{font-size:20px; border-bottom:1px solid var(--line); padding-bottom:.25em}
+h3{font-size:17.5px}
+a{color:var(--accent)}
+ul,ol{padding-left:1.4em}
+li{margin:.2em 0}
+li.task{list-style:none; margin-left:-1.2em}
+li.task input{margin-right:.5em; transform:scale(1.2); accent-color:var(--accent)}
+li.task.done{color:var(--muted)}
+blockquote{margin:.8em 0; padding:.5em .9em; background:var(--card);
+  border-left:4px solid var(--accent); border-radius:0 8px 8px 0; color:var(--muted)}
+blockquote>:first-child{margin-top:0} blockquote>:last-child{margin-bottom:0}
+code{background:var(--code); padding:.12em .4em; border-radius:5px; font-size:.92em}
+pre{background:var(--code); padding:12px 14px; border-radius:10px; overflow-x:auto;
+  font-size:13.5px; line-height:1.55; -webkit-overflow-scrolling:touch}
+pre code{background:none; padding:0}
+.tbl{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:.9em 0;
+  border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th,td{border:1px solid var(--line); padding:7px 10px; text-align:left; white-space:nowrap}
+th{background:var(--card)}
+tr:nth-child(even) td{background:var(--card)}
+hr{border:0; border-top:1px solid var(--line); margin:1.6em 0}
+.fab{position:fixed; right:16px; z-index:40; border:none; border-radius:999px;
+  background:var(--accent); color:#fff; box-shadow:0 4px 14px rgba(0,0,0,.25);
+  font-size:15px; padding:11px 16px; cursor:pointer}
+#today-fab{bottom:calc(74px + env(safe-area-inset-bottom)); display:none}
+#top-fab{bottom:calc(20px + env(safe-area-inset-bottom)); padding:11px 14px; display:none}
+.built{color:var(--muted); font-size:12.5px; text-align:center; padding:18px 0}
+</style>
 </head>
 <body>
-    MiunaPA
+<header class="bar">
+  <h1>🗾 大阪行程 2026/06</h1>
+  <button id="theme" title="深淺色">🌙</button>
+  <button id="menu">目錄 ☰</button>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<nav id="nav">
+  <div class="grp">每日行程</div>
+  <a href="#s0" data-target="s0">行程總表</a>
+  <a href="#s1" data-target="s1" data-date="2026-06-17">D1 6/17 抵達</a>
+  <a href="#s2" data-target="s2" data-date="2026-06-18">D2 6/18 奈良</a>
+  <a href="#s3" data-target="s3" data-date="2026-06-19">D3 6/19 比叡山</a>
+  <a href="#s4" data-target="s4" data-date="2026-06-20">D4 6/20 京都東山</a>
+  <a href="#s5" data-target="s5" data-date="2026-06-21">D5 6/21 嵐山</a>
+  <a href="#s6" data-target="s6" data-date="2026-06-22">D6 6/22 跨城市</a>
+  <a href="#s7" data-target="s7" data-date="2026-06-23">D7 6/23 大阪南區</a>
+  <a href="#s8" data-target="s8" data-date="2026-06-24">D8 6/24 出發</a>
+  <div class="grp">參考資料</div>
+  <a href="#s9" data-target="s9">基本資訊</a>
+  <a href="#s10" data-target="s10">交通</a>
+  <a href="#s11" data-target="s11">住宿</a>
+  <a href="#s12" data-target="s12">景點</a>
+  <a href="#s13" data-target="s13">美食</a>
+  <a href="#s14" data-target="s14">購物</a>
+  <a href="#s15" data-target="s15">行前準備</a>
+  <a href="#s16" data-target="s16">工作區說明</a>
+</nav>
+
+<main>
+<section id="s0">
+<h1>99 - 最終行程</h1>
+<p><strong>8 天 7 夜　|　2026/6/17（三）–6/24（三）　|　一人獨旅</strong></p>
+<blockquote>
+<p>各日 day-block 草稿在 <code>行程-MMDD-XXX.md</code> 系列檔案（如 <code>行程-0619-比叡山日.md</code>）。
+本檔只放骨架 + 索引。所有 day-block 草稿完成後再來收斂順序。</p>
+</blockquote>
+<hr>
+<h2>日期框架</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Day</th>
+<th>日期</th>
+<th>主題</th>
+<th>對應 day-block</th>
+<th>住宿</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Day 1</td>
+<td>6/17（三）</td>
+<td>抵達日 — KIX 09:30 落地 → 進新世界 + 住吉大社 / 四天王寺 / 串カツ</td>
+<td>✅</td>
+<td>大阪 The OneFive（新世界）✅</td>
+</tr>
+<tr>
+<td>Day 2</td>
+<td>6/18（四）</td>
+<td>奈良一日 → 晚移動京都（飯店 23:00 前抵達）</td>
+<td>🔶 頭尾定 + 移動</td>
+<td>京都 樂天 STAY URBAN 四條河原町 ✅（15:00 check-in）</td>
+</tr>
+<tr>
+<td>Day 3</td>
+<td>6/19（五）</td>
+<td>⭐ 比叡山一日</td>
+<td>✅</td>
+<td>京都 樂天 STAY URBAN 四條河原町</td>
+</tr>
+<tr>
+<td>Day 4</td>
+<td>6/20（六）</td>
+<td>⭐ 京都東山日 → 樂天退房 → 換京都 Sekia Wagaya</td>
+<td>✅</td>
+<td>京都 Sekia Wagaya Hotel ✅</td>
+</tr>
+<tr>
+<td>Day 5</td>
+<td>6/21（日）</td>
+<td><strong>京都嵐山 + 鐵博日 → 移大阪</strong></td>
+<td>✅</td>
+<td>大阪 相鐵 Grand Fresa ✅</td>
+</tr>
+<tr>
+<td>Day 6</td>
+<td>6/22（一）</td>
+<td>跨城市 day trip（神戶/姬路/高野山/滋賀 四選一）</td>
+<td>⏳ 待拍板</td>
+<td>大阪 相鐵 Grand Fresa ✅</td>
+</tr>
+<tr>
+<td>Day 7</td>
+<td>6/23（二）</td>
+<td><strong>大阪南區一日</strong>（大阪城 + 黑門 + 購物 + 道頓堀）</td>
+<td>✅</td>
+<td>大阪 相鐵 Grand Fresa ✅</td>
+</tr>
+<tr>
+<td>Day 8</td>
+<td>6/24（三）</td>
+<td>出發日 — 17:00 抵難波 → 18:07 KIX → 20:55 起飛</td>
+<td>🔶 尾段定</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>已鎖定時間錨點</h2>
+<h3>Day 1 — 6/17（三）抵達日</h3>
+<pre><code>凌晨 02:00  TPE 桃機 T1 → T'way TW664 起飛
+05:25       TAE 大邱抵達 → 轉機（2h35m）
+08:00       TAE → T'way TW311 起飛
+09:30       KIX 關西機場 T1 抵達
+~11:30      進新世界（新今宮、含入境 + 領行李 + 南海）
+下午       阪堺電車 → 住吉大社 → 四天王寺
+晚上       新世界串カツ + 啤酒 → 回飯店睡
+</code></pre>
+<blockquote>
+<p>含 6/16 出發預備（板橋 → 桃機）+ 飛行 + 進新世界完整硬行程見 <a href="./行程-0617-抵達日.md">行程-0617-抵達日.md</a>。</p>
+</blockquote>
+<h3>Day 2 — 6/18（四）奈良一日 → 晚移京都</h3>
+<pre><code>07:30~08:00  新世界退房 + 拉行李
+08:25~09:05  近鉄なんば → 近鉄奈良（寄行李）
+~09:20~17:30 奈良公園（餵鹿 + 東大寺/春日/興福、⏳ 順序待排）
+~18:00       離奈良（建議）→ 京阪祇園四条 → 樂天 check-in
+晚上         河原町 / 木屋町 居酒屋
+</code></pre>
+<blockquote>
+<p>完整見 <a href="./行程-0618-奈良.md">行程-0618-奈良.md</a>。最晚離奈良 ~21:00（受樂天 check-in 截止、待確認）。</p>
+</blockquote>
+<h3>Day 3 — 6/19（五）比叡山一日</h3>
+<pre><code>06:30 起床
+08:00 出門（樂天 STAY URBAN 四條河原町）
+08:31 出町柳發 普通車 → 08:45 八瀨比叡山口
+09:00 叡山ケーブル↑
+... 完整 timeline 見 行程-0619-比叡山日.md
+~14:30–15:30 回京都市區
+晚上  河原町 / 木屋町 / 先斗町 居酒屋
+</code></pre>
+<h3>Day 4 — 6/20（六）京都東山日 → 換京都飯店</h3>
+<pre><code>06:30 起床
+07:00 退房（樂天 STAY URBAN、self check-out）
+       deadline 11:00
+07:09 京阪祇園四条駅 寄物
+07:25 京阪 → 伏見稻荷
+... 完整 timeline 見 行程-0620-京都東山日.md
+~14:30 結束東山日
+14:30 ~ 15:30 取行李 → 移動到 Sekia Wagaya（西七條、京都駅西邊）
+~15:30 Sekia Wagaya check-in
+晚上    河原町 / 木屋町晚餐（搭巴士 / JR 回市區）OR 京都駅周邊晚餐
+</code></pre>
+<h3>Day 5 — 6/21（日）京都嵐山 + 鐵博日</h3>
+<pre><code>07:00 起床（Sekia Wagaya）
+08:00 退房 + 拖行李
+08:00 ~ 08:15 京都駅 寄物（鐵博下午會用到、可寄京都駅 OR 阪急河原町）
+08:15 ~ 08:40 京都駅 → JR 嵯峨野線 → 嵯峨嵐山駅（~15 分、¥240）
+       OR 飯店 → 阪急桂 → 阪急嵐山（~30 分）
+08:40 ~ 08:55 步行到嵐山街區 / 天龍寺
+09:00 ~ 10:00 ⭐ 天龍寺（8:30 開門、~1h、¥500）
+10:00 ~ 10:30 竹林小徑 + 渡月橋（路過拍照）
+10:30 ~ 10:50 嵯峨嵐山 → JR 京都駅（~15 分）
+10:50 ~ 11:30 京都駅 取行李 / 寄到鐵博 + 午餐
+11:30 ~ 11:45 京都駅 → 京都鐵博（巴士 / 步行）
+12:00 ~ 16:30 ⭐ 京都鐵博（4.5h、鐵道控盡興）
+16:30 ~ 17:00 京都駅
+17:00 ~ 17:30 JR / 阪急 → 大阪（~30 分）
+~18:00 抵達大阪相鐵（日本橋）check-in
+晚上    難波 / 飯店周邊晚餐（道頓堀留 6/23）
+</code></pre>
+<h3>Day 6 — 6/22（一）大阪 / 跨城市 day trip</h3>
+<pre><code>日中    ⏳ 待排（跨城市：神戶 / 姬路 / 高野山 / 滋賀東岸 — 四選一、見 行程-0622）
+~晚    回相鐵 Grand Fresa（日本橋、連住、不換房）
+</code></pre>
+<h3>Day 7 — 6/23（二）大阪南區一日</h3>
+<pre><code>09:00~11:00  大阪城（西之丸庭園 6 月紫陽花 + 天守閣）
+11:20~13:00  黑門市場 午餐（飯店旁）
+13:00~17:00  心齋橋 / 難波 購物（買衣服、唯一購物日）
+17:30~21:00  道頓堀（Glico/戎橋）→ 晚餐 + 法善寺橫丁居酒屋
+</code></pre>
+<blockquote>
+<p>完整見 <a href="./行程-0623-大阪南區.md">行程-0623-大阪南區.md</a>。以相鐵（日本橋）為圓心、傍晚後全步行。</p>
+</blockquote>
+<h3>Day 8 — 6/24（三）出發日</h3>
+<pre><code>~16:30 從大阪市區出發
+17:00  抵達難波駅
+17:30  難波 → 特急 Rapi:t β 起步（¥1,490）
+        OR 17:34 空港急行（¥970）OR 17:00 早一班 Rapi:t
+18:07  抵達 KIX 關西機場 T1（Rapi:t β）
+        check-in + 安檢
+20:55  AirAsia X D7379 起飛 → 23:05 TPE
+</code></pre>
+<blockquote>
+<p>備案：可改搭 17:00 班 Rapi:t β（17:37 抵 KIX、提早 30 分）— 若想更保守
+末班：17:34 空港急行（18:24 抵 KIX）— 若 17:30 沒趕上仍有後續
+利木津巴士 / JR HARUKA 也可、但票價偏高，南海性價比最佳</p>
+</blockquote>
+<hr>
+<h2>Day-block 索引</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>日期 / 編號</th>
+<th>名稱</th>
+<th>草稿檔</th>
+<th>狀態</th>
+<th>主要景點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>6/17（三）</strong></td>
+<td>抵達日（紅眼 + 大邱轉機 → 進大阪）</td>
+<td><a href="./行程-0617-抵達日.md">行程-0617-抵達日.md</a></td>
+<td>✅ 定案</td>
+<td>板橋→桃機 + 飛行 + 進新世界 → 住吉大社 / 四天王寺 / 串カツ</td>
+</tr>
+<tr>
+<td><strong>6/18（四）</strong></td>
+<td>奈良一日（餵鹿）</td>
+<td><a href="./行程-0618-奈良.md">行程-0618-奈良.md</a></td>
+<td>🔶 頭尾定、白天待排</td>
+<td>餵鹿 + 東大寺 + 春日 + 興福 + 奈良町</td>
+</tr>
+<tr>
+<td><strong>6/19（五）</strong></td>
+<td>比叡山一日穿越</td>
+<td><a href="./行程-0619-比叡山日.md">行程-0619-比叡山日.md</a></td>
+<td>✅ 定案</td>
+<td>叡山ケーブル + 延曆寺 + 坂本ケーブル + 京阪京津線</td>
+</tr>
+<tr>
+<td><strong>6/20（六）</strong></td>
+<td>京都東山日（換飯店）</td>
+<td><a href="./行程-0620-京都東山日.md">行程-0620-京都東山日.md</a></td>
+<td>✅ 定案</td>
+<td>樂天退房 → 伏見稻荷 + 清水寺 + 祇園 → Sekia Wagaya</td>
+</tr>
+<tr>
+<td><strong>6/21（日）</strong></td>
+<td>京都嵐山 + 鐵博日（移大阪）</td>
+<td><a href="./行程-0621-嵐山鐵博日.md">行程-0621-嵐山鐵博日.md</a></td>
+<td>✅ 定案</td>
+<td>Sekia Wagaya 退房 → 嵐山天龍寺 → 京都鐵博 → 大阪</td>
+</tr>
+<tr>
+<td><strong>6/22（一）</strong></td>
+<td>跨城市 day trip</td>
+<td><a href="./行程-0622-跨城市.md">行程-0622-跨城市.md</a></td>
+<td>⏳ 待拍板</td>
+<td>神戶 / 姬路 / 高野山 / 滋賀東岸 四選一</td>
+</tr>
+<tr>
+<td><strong>6/23（二）</strong></td>
+<td>大阪南區一日</td>
+<td><a href="./行程-0623-大阪南區.md">行程-0623-大阪南區.md</a></td>
+<td>✅ 定案</td>
+<td>大阪城 + 黑門午餐 + 心齋橋購物 + 道頓堀晚餐 + 居酒屋</td>
+</tr>
+<tr>
+<td><strong>6/24（三）</strong></td>
+<td>出發日（大阪→KIX→台北）</td>
+<td><a href="./行程-0624-出發日.md">行程-0624-出發日.md</a></td>
+<td>🔶 尾段定、上午待排</td>
+<td>退房 → 上午自由 → 南海 → 20:55 AirAsia X</td>
+</tr>
+<tr>
+<td>候補</td>
+<td>京都進階日</td>
+<td>（未建立）</td>
+<td>🔍 無空檔候補</td>
+<td>金閣 / 銀閣 / 二条城 / 御所 / 宇治</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>待寫 day-block 優先級</h2>
+<blockquote>
+<p>抵達日(6/17)、比叡山(6/19)、東山(6/20)、嵐山+鐵博(6/21)、大阪南區(6/23) 已定案；6/18 奈良頭尾已定。以下仍待處理：</p>
+</blockquote>
+<ol>
+<li>🥇 6/22（一）跨城市 day trip — 神戶 / 姬路、高野山、滋賀東岸 三選一（等 user 拍板）</li>
+<li>6/18 奈良白天景點順序（<code>行程-0618</code> 中段）</li>
+<li>出發日上午（6/24 三）— 半天，最後微調</li>
+<li>京都進階（金閣 / 銀閣 / 二条城 / 御所 / 宇治）— 目前無空檔，候補</li>
+</ol>
+<hr>
+<h2>收斂方式（最後階段才做）</h2>
+<p>當所有 day-block 草稿完成後，在這份檔案：
+1. 把 day-block 排進 Day 1–8
+2. 確定哪個 day-block 對應哪個日期
+3. 跨日依存（例如住宿換房）一起考慮
+4. 最終 finalize 時刻表 / 預訂事項</p>
+</section>
+<section id="s1" data-date="2026-06-17">
+<h1>行程 6/17（三）— 抵達日（紅眼 + 大邱轉機 → 進大阪）</h1>
+<blockquote>
+<p><strong>日期：2026/6/17（週三）</strong>
+草稿狀態：✅ 硬行程（6/16 預備 + 飛行 + KIX 進大阪）已展開　⏳ 下午 / 晚上活動待排　⏳ 住宿難波待訂
+對應 <code>99-最終行程.md</code> Day 1</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p><strong>紅眼出發 + 大邱轉機 + 落地進大阪</strong>：6/16 晚從板橋搭捷運到桃機 → 02:00 紅眼起飛 → 大邱轉機（領行李重掛）→ 09:30 落地 KIX → ~11:30 進新世界。下午阪堺電車 + 住吉大社 + 四天王寺、晚上樓下串カツ收工。</p>
+<pre><code>6/16 晚 板橋 ─(環狀線)→ 新北產業園區 ─(機捷)→ 桃機 T1
+6/17 02:00 TPE ─(TW664)→ 05:25 大邱（轉機 2h35m、領行李重掛）
+     08:00 大邱 ─(TW311)→ 09:30 KIX T1
+     入境 + 領行李 + 南海 → ~11:30 新今宮（新世界）
+     下午 阪堺電車 → 住吉大社 → 四天王寺；晚上 新世界串カツ → 睡
+</code></pre>
+<hr>
+<h2>6/16（二）出發預備：板橋 → 桃機 T1</h2>
+<blockquote>
+<p>02:00 班機。<strong>前一天沒事 → 不趕末班；表定 21:00 到桃機 T1</strong>（要更早也行）。唯一要記得：T'way 報到約 <strong>23:00 才開、~01:00 截止</strong>，所以 21:00–23:00 先在<strong>管制區外（landside）餐廳 / 商店晃</strong> → 約 23:00 報到 + 託運 → 安檢 → 入管制區候機。</p>
+<p>早到可晃：T1 管制區外美食街 / 商店、T1↔T2 之間 <strong>電車（skytrain）</strong> 順便搭一段、機場周邊。（觀景台你沒興趣、略）</p>
+</blockquote>
+<h3>行前 checklist（6/16 出門前）</h3>
+<ul>
+<li class="task"><input type="checkbox" disabled> 護照（效期 ≥ 6 個月）+ 電子機票（T'way 訂位代號）</li>
+<li class="task"><input type="checkbox" disabled> Visit Japan Web 入境登錄完成（截圖 QR：入境審查 + 海關）</li>
+<li class="task"><input type="checkbox" disabled> <strong>Suica 餘額儲足</strong>（落地 KIX 後南海 + 大阪市內都刷它）</li>
+<li class="task"><input type="checkbox" disabled> 現金日幣（建議 ¥30,000–50,000）+ 信用卡 ×2</li>
+<li class="task"><input type="checkbox" disabled> eSIM / 網路開通設定（或落地買）</li>
+<li class="task"><input type="checkbox" disabled> 行李 20kg 內（去程 T'way 智能票價含 15kg 託運 + 10kg 手提 → 注意託運上限）</li>
+<li class="task"><input type="checkbox" disabled> 行動電源、充電線（日本 A 型 100V，台灣電器可直用）</li>
+</ul>
+<h3>路線（表定 21:00 到 T1 → ~19:50 出板橋）</h3>
+<blockquote>
+<p>從「21:00 到桃機 T1」回推（機捷直達車 26 分為主、含候車 / 轉乘緩衝）。保險抓 <strong>19:45 出門</strong>（晚間班距 12–15 分、早 10 分免等車焦慮）。</p>
+</blockquote>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>步驟</th>
+<th>時間</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>到 <strong>板橋站</strong></td>
+<td>~19:50</td>
+</tr>
+<tr>
+<td>板橋（環狀線 Y16）上車</td>
+<td>~20:00</td>
+</tr>
+<tr>
+<td>新北產業園區（Y20）下車</td>
+<td>~20:12（4 站、~12 分）</td>
+</tr>
+<tr>
+<td>站內轉機捷 A3 + 候車</td>
+<td>~6–8 分</td>
+</tr>
+<tr>
+<td><strong>機捷 A3 發</strong>（直達車 26 分 / 普通車 ~35 分）</td>
+<td>~20:25–20:30</td>
+</tr>
+<tr>
+<td><strong>機場一航廈 A12 到</strong></td>
+<td>~20:55–21:00</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>此時間遠在末班車前、無趕車壓力。21:00 到後在管制區外晃 → ~23:00 報到 + 託運 → 安檢候機。</p>
+</blockquote>
+<h3>末班車（早去用不到、僅備用參考）</h3>
+<blockquote>
+<p>你計畫早到 → 以下僅供臨時晚出發時 fallback。</p>
+</blockquote>
+<ul>
+<li><strong>機捷 A3 → A12</strong>：</li>
+<li>直達車末班 <strong>23:10 發 → 23:36 到</strong></li>
+<li>普通車末班 <strong>23:35 發 → 00:10 到</strong></li>
+<li>深夜加班普通車 <strong>23:50 發 → 00:25 到</strong>（絕對底線）</li>
+<li><strong>環狀線 板橋 → 新北產業園區末班</strong>：⏳ 待確認（官網時刻表 / 客服 02-2805-9877，07:00–23:00）——務必抓在能銜接機捷末班前到 A3。</li>
+<li>⚠️ 紅眼日建議搭 <strong>22:30–23:10 直達車</strong>（~23:00–23:36 到 T1）保險，別壓到末班。</li>
+</ul>
+<h3>備案</h3>
+<ul>
+<li><strong>計程車 / Uber 板橋 → 桃機 T1</strong>：~40–50 分、約 NT$1,000–1,300。免末班壓力，深夜最穩。</li>
+<li>或 6/16 不睡、直接機場過夜（T1 24h 區）。</li>
+</ul>
+<hr>
+<h2>6/17（三）流程表</h2>
+<h3>階段 1 — 凌晨飛行（TPE → 大邱 → KIX）</h3>
+<pre><code>02:00  TPE 桃園 T1 → T'way TW664（B737-800）起飛
+05:25  TAE 大邱 抵達（飛行 2h25m）
+       ═══ 轉機 2h35m、見下方「大邱轉機注意」═══
+08:00  TAE 大邱 → T'way TW311（B737-800）起飛
+09:30  KIX 關西 T1 抵達（飛行 1h30m）
+</code></pre>
+<h3>階段 2 — KIX 入境 + 進新世界（09:30 – ~11:40）</h3>
+<pre><code>09:30        KIX T1 落地
+09:30~10:30  入境審查（Visit Japan Web QR）→ 領行李 → 海關（紅眼 + 國際線，抓 ~1h）
+10:30~10:45  南海電鐵 關西空港駅（KIX T1 直結）
+             ┌ 空港急行 → 新今宮 ~43 分、¥970（刷 Suica）★ 直達、CP 高
+             └ Rapi:t 特急 → 新今宮 ~37 分、~¥1,450（需特急券、鐵道控可體驗藍色子彈）
+~11:30       抵 南海 新今宮 → 通天閣口 徒步 6 分 → The OneFive Osaka Shinsekai
+~11:40       飯店寄行李（15:00 前無法 check-in、先寄放）
+</code></pre>
+<h3>階段 3 — 下午：阪堺電車 + 住吉大社 +（回程）四天王寺</h3>
+<blockquote>
+<p>主軸：路面電車（鐵道控）+ 攝津國一之宮 + 日本最古官寺。阪堺電車均一 ¥240、收 IC → <strong>全程刷 Suica</strong>。</p>
+</blockquote>
+<pre><code>~11:40        The OneFive（新世界）寄行李、輕裝
+11:40~12:20   午餐（新世界周邊簡單吃；串カツ留晚上）
+12:20~12:25   步行 → 阪堺電車 恵美須町駅（起點、~5 分）
+12:30~12:55   ⭐ 阪堺電車 恵美須町 → 住吉鳥居前（阪堺線、~25 分、¥240 刷 Suica）
+12:55~14:20   ⭐ 住吉大社（攝津國一之宮、反橋太鼓橋、國寶本殿四棟；免費、~1.5h）
+14:20~14:25   步行 → 阪堺 住吉駅（轉上町線）
+14:30~14:55   ⭐ 阪堺電車 上町線 住吉 → 天王寺駅前（~25 分、¥240 刷 Suica）
+14:55~15:10   步行 → 四天王寺（~12–15 分）
+15:10~16:20   ⭐ 四天王寺（中心伽藍 五重塔 + 極樂淨土庭園；日本最古官寺、聖德太子；中心伽藍 ¥300、閉門 ~16:30）
+16:20~16:50   回新世界（天王寺 →〔御堂筋線〕動物園前 1 站、或阪堺回恵美須町）
+~17:00        The OneFive check-in（15:00 後）+ 小歇 / 補眠（紅眼）
+</code></pre>
+<blockquote>
+<p>想清爽：住吉大社後直接回飯店、跳過四天王寺。
+想加碼紫陽花：天王寺一帶可改去長居植物園（御堂筋線 ~12 分），但下午會更滿。</p>
+</blockquote>
+<h3>階段 4 — 晚上：新世界串カツ + 啤酒 → 收工</h3>
+<pre><code>18:30~20:30   ⭐ 新世界 串カツ + 啤酒（飯店樓下、ジャンジャン横丁；八重勝 / だるま 等名店、可能排隊）
+20:30~20:50   通天閣夜景燈光 路過散步（不上塔）→ 回飯店
+~21:00        回 The OneFive 睡覺（紅眼日早收、養精蓄銳 6/18 奈良）
+</code></pre>
+<blockquote>
+<p>晚餐不去道頓堀（留 6/23）。串カツ吃完小酌即收，隔天 6/18 一早 JR 新今宮 → 奈良。</p>
+</blockquote>
+<hr>
+<h2>大邱轉機注意（重要）</h2>
+<blockquote>
+<p>5:25 落地大邱 → 8:00 再起飛，<strong>2h35m 轉機</strong>。</p>
+</blockquote>
+<ul>
+<li>⚠️ <strong>行李不可直掛</strong>：大邱要<strong>入境韓國轉機/領出託運行李 → TW311 重新 check-in 託運 → 再過韓國境內安檢</strong>，才到登機門。</li>
+<li>2h35m 對「領行李 + 重掛 + 安檢」算夠，但要把握、別在免稅區逗留太久。</li>
+<li>隨身保留：護照、TW311 訂位資訊、貴重物品 + 行動電源（行動電源不可託運）。</li>
+</ul>
+<hr>
+<h2>行李 / 寄物（落地後到 check-in 前）</h2>
+<ul>
+<li>KIX → 難波輕裝；大件行李一路自己拖（無宅配需求，當天就進難波飯店）。</li>
+<li>11:30 抵難波後行李寄飯店（多數飯店可提早寄放）→ 下午輕裝活動 → 15:00 後回來 check-in。</li>
+<li>若飯店不便寄放：難波駅周邊 coin locker / Ecbo Cloak。</li>
+</ul>
+<hr>
+<h2>住宿（6/17）✅ 已訂</h2>
+<ul>
+<li><strong>The OneFive Osaka Shinsekai（大阪新世界一五飯店）</strong> — Agoda、USD 21.26（~TWD 670）、6/12 扣款（卡末四碼 7704）。</li>
+<li>位置：浪速區恵美須東 2-1-24（<strong>新世界</strong>、通天閣旁）。地下鐵動物園前 4 分 / 南海・JR 新今宮 6 分 / 恵美須町（阪堺電車）近。</li>
+<li>動線優勢：KIX → 南海新今宮直達；下午阪堺電車（恵美須町）+ 串カツ門口；<strong>6/18 JR 新今宮 → 奈良直達</strong>（大和路快速 ~35 分）。</li>
+<li>⚠️ 區域提醒：新今宮 / 西成一帶是超便利但較龍蛇雜處的廉旅區，治安大致 OK，單人夜間注意隨身、避開過暗巷弄即可。</li>
+<li>詳見 <code>02-住宿.md</code>。</li>
+</ul>
+<hr>
+<h2>Pre-trip TODO</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> （早去可略）若臨時晚出發才需確認環狀線 / 機捷末班車時間</li>
+<li class="task"><input type="checkbox" disabled> Visit Japan Web 登錄 + 截圖 QR</li>
+<li class="task"><input type="checkbox" disabled> Suica 餘額儲足</li>
+<li class="task"><input type="checkbox" disabled> 確認 T'way 02:00 班機報到開始 / 截止時間</li>
+<li class="task"><input type="checkbox" disabled> 大邱轉機：確認領行李重掛動線（出發前查大邱機場轉機流程）</li>
+<li class="task"><input type="checkbox" disabled> 確認四天王寺 6 月閉門時間；串カツ名店公休 / 排隊狀況</li>
+</ul>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6/16 出發路線（板橋→桃機）</td>
+<td>✅ 鎖定（前一天沒事、早去、不趕末班）</td>
+</tr>
+<tr>
+<td>飛行段時刻</td>
+<td>✅ 鎖定（機票已定）</td>
+</tr>
+<tr>
+<td>KIX 進新世界（新今宮）</td>
+<td>✅ 鎖定</td>
+</tr>
+<tr>
+<td>下午活動</td>
+<td>✅ 定案（阪堺電車 + 住吉大社 + 四天王寺）</td>
+</tr>
+<tr>
+<td>晚上活動</td>
+<td>✅ 定案（新世界串カツ + 啤酒）</td>
+</tr>
+<tr>
+<td>住宿</td>
+<td>✅ 已訂（The OneFive 新世界）</td>
+</tr>
+</tbody>
+</table></div>
+</section>
+<section id="s2" data-date="2026-06-18">
+<h1>行程 6/18（四）— 奈良一日（餵鹿）→ 晚移京都</h1>
+<blockquote>
+<p><strong>日期：2026/6/18（週四）</strong>
+出發飯店：The OneFive Osaka Shinsekai（新世界）→ 早上退房
+抵達飯店：京都 樂天 STAY URBAN 四條河原町 ✅（連住 6/18–20）
+草稿狀態：✅ 頭（退房→奈良動線+寄行李）/ 尾（傍晚移京都）已定　⏳ 白天奈良景點順序待排
+對應 <code>99-最終行程.md</code> Day 2</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p><strong>大阪 → 奈良餵鹿一日 → 傍晚移京都（兩段制換城市）</strong>：新世界退房拉行李 → 近鉄奈良寄行李 → 奈良公園輕裝玩一天 → 取行李傍晚移京都河原町 → 入住 + 河原町夜飲。</p>
+<pre><code>新世界 退房 ─(地下鉄+近鉄)→ 近鉄奈良（寄行李）
+                              ↓ 步行
+                         奈良公園（餵鹿、⏳ 景點待排）
+                              ↓ 取行李
+近鉄奈良 ─(近鉄+京阪)→ 京阪祇園四条 → 樂天 STAY URBAN（河原町）
+                              ↓
+                         河原町 / 木屋町 / 先斗町 居酒屋夜飲
+</code></pre>
+<hr>
+<h2>流程表</h2>
+<h3>階段 1 — 早上：退房 + 進奈良 + 寄行李（✅ 已定）</h3>
+<pre><code>07:30        起床
+08:00        The OneFive 退房（self check-out）+ 拉行李
+08:00~08:05  步行 → 動物園前駅（飯店 ~4 分）
+08:05~08:20  御堂筋線 動物園前 → なんば → 走到 近鉄なんば
+08:25~09:05  ⭐ 近鉄なんば → 近鉄奈良（快速急行 ~40 分、¥680、刷 Suica）
+09:05~09:20  近鉄奈良駅 coin locker 寄行李 → 輕裝
+09:20~       步行進奈良公園（興福寺 ~5 分 / 東大寺 ~13 分）
+</code></pre>
+<blockquote>
+<p><strong>為什麼走近鉄而非 JR</strong>：近鉄奈良站就在奈良公園邊（走 5–13 分到景點群），JR 奈良離公園遠（~20 分 / 巴士）。雖近鉄在難波轉一次，但<strong>拖行李距離最短</strong>。
+<strong>JR 替代</strong>：JR 新今宮 → 大和路快速 → JR 奈良（~33 分、¥570、不用轉車），但下車後離公園遠。</p>
+</blockquote>
+<h3>階段 2 — 白天：奈良公園 ⏳ 景點順序待排</h3>
+<blockquote>
+<p>主軸：<strong>餵鹿</strong>（全區、鹿仙貝 ¥200）。以下候選都在步行圈，順序 / 取捨之後再排。</p>
+</blockquote>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>候選</th>
+<th>開放</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>奈良公園（餵鹿）</td>
+<td>全日免費</td>
+<td><strong>主目標</strong></td>
+</tr>
+<tr>
+<td>東大寺 大佛殿</td>
+<td>~07:30–17:30（最後入場 ~17:00）</td>
+<td>必訪、¥800</td>
+</tr>
+<tr>
+<td>春日大社</td>
+<td>特別參拜 ~09:00–16:00、境內到傍晚</td>
+<td>鹿群參道、免費（本殿區 ¥700）</td>
+</tr>
+<tr>
+<td>興福寺（五重塔 / 國寶館）</td>
+<td>國寶館 ~09:00–17:00</td>
+<td>近鉄奈良走過去就到</td>
+</tr>
+<tr>
+<td>奈良町</td>
+<td>店家 ~10:00–18:00</td>
+<td>老街、雨天備案</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>紫陽花補充：<strong>矢田寺</strong>（大和郡山、奈良紫陽花名所）在奈良公園外 ~30 分車程，要去得另算、會吃掉公園時間——預設不排，想看再說。</p>
+</blockquote>
+<pre><code>~09:20 – ~17:30   ⏳ 奈良公園（餵鹿 + 上表候選、順序待排）
+   午餐：奈良町 / 公園周邊（釜飯 志津香、中谷堂麻糬等）
+</code></pre>
+<h3>階段 3 — 傍晚：取行李 → 移京都 → 入住 + 夜飲（✅ 已定框架）</h3>
+<pre><code>~17:30        奈良公園活動結束
+17:30~17:50   步行回 近鉄奈良駅 + 取行李
+~18:00        ⭐ 離開奈良（建議 18:00–18:30、保留京都夜生活）
+   近鉄奈良 →〔急行〕丹波橋 →〔京阪本線〕祇園四条（~50–55 分、刷 Suica）★ 直達飯店最近
+   OR 近鉄奈良 → 近鉄京都/京都駅 → 阪急/地下鐵 → 河原町
+~19:00~19:15  京阪祇園四条 → 步行 9 分 → 樂天 STAY URBAN check-in
+晚上          ⭐ 河原町 / 木屋町 / 先斗町 居酒屋夜飲（你最愛、樂天就在這圈）
+</code></pre>
+<hr>
+<h2>🎯 最晚何時離開奈良</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>情境</th>
+<th>最晚離開</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🍶 <strong>保留京都夜生活（推薦）</strong></td>
+<td><strong>~18:00–18:30</strong></td>
+<td>取行李就走 → 樂天 ~19:15 check-in → 河原町居酒屋</td>
+</tr>
+<tr>
+<td>😤 純衝奈良到最後</td>
+<td><strong>~21:00–21:30</strong></td>
+<td>受限於<strong>樂天 check-in 截止</strong>（近鉄/京阪 ~23:00+ 都還有車、末班非瓶頸）；會犧牲京都晚上</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠️ 樂天 STAY URBAN 是無人櫃台<strong>自助 check-in</strong>（原記「23:00 前抵達」）。<strong>最晚自助入住 / 受付時間出發前向樂天確認</strong>——影響「絕對最晚」那格。</p>
+</blockquote>
+<hr>
+<h2>行李處理</h2>
+<ul>
+<li>主行李 6/18 一路自己拖：新世界 → 近鉄奈良（寄 coin locker）→ 取回 → 京都樂天。</li>
+<li>近鉄奈良駅 coin locker：大型 ~¥700；6/18 平日較不會滿，滿了用 <strong>Ecbo Cloak / 站內手荷物預かり</strong>。</li>
+<li>輕裝逛奈良（小背包、雨具、水、鹿仙貝錢）。</li>
+</ul>
+<hr>
+<h2>住宿（6/18）✅ 已訂</h2>
+<ul>
+<li><strong>樂天 STAY URBAN 四條河原町</strong>（連住 6/18–20、2 晚、Agoda）。</li>
+<li>check-in 15:00 起、河原町通松原上；近京阪祇園四条 9 分 / 阪急京都河原町 5–7 分。</li>
+<li>隔天 6/19 從這裡出發跑比叡山（見 <code>行程-0619</code>）。</li>
+</ul>
+<hr>
+<h2>Pre-trip TODO</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> <strong>確認樂天 STAY URBAN 最晚自助 check-in / 受付時間</strong>（定「絕對最晚」離奈良）</li>
+<li class="task"><input type="checkbox" disabled> 近鉄なんば → 近鉄奈良 快速急行班次（每 ~20 分一班、確認早上時刻）</li>
+<li class="task"><input type="checkbox" disabled> 近鉄奈良 coin locker 大型置物 6/18 是否充足（備援 Ecbo）</li>
+<li class="task"><input type="checkbox" disabled> 東大寺 / 春日大社 / 興福寺 6 月開放與最後入場時間</li>
+<li class="task"><input type="checkbox" disabled> 排定白天奈良景點順序（解鎖 階段 2）</li>
+</ul>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>早上動線（退房→近鉄奈良→寄行李）</td>
+<td>✅ 定案</td>
+</tr>
+<tr>
+<td>傍晚移京都 + 入住框架</td>
+<td>✅ 定案</td>
+</tr>
+<tr>
+<td>最晚離奈良時間</td>
+<td>✅ 已分析（絕對最晚待確認樂天 check-in）</td>
+</tr>
+<tr>
+<td>白天奈良景點順序</td>
+<td>⏳ 待排</td>
+</tr>
+<tr>
+<td>住宿</td>
+<td>✅ 已訂（樂天）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>串接</h2>
+<ul>
+<li><strong>前一天</strong>：6/17（三）抵達日 → 住 The OneFive 新世界（見 <code>行程-0617</code>）</li>
+<li><strong>隔天</strong>：6/19（五）比叡山一日 → 從樂天 STAY URBAN 出發（見 <code>行程-0619</code>）</li>
+</ul>
+</section>
+<section id="s3" data-date="2026-06-19">
+<h1>行程 6/19（五）— 比叡山一日穿越（順時針鐵道日）</h1>
+<blockquote>
+<p><strong>日期：2026/6/19（週五）✅ 定案</strong>
+飯店：樂天 STAY URBAN 四條河原町（連住 6/18-6/20）
+對應 <code>03-景點.md</code> 京都章「比叡山一日穿越」section</p>
+<p>草稿狀態：✅ 路線 / 時刻 / 預算 / 雨天備案完成　🔍 票券待查</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p><strong>「上山纜車、下山纜車、收尾路面電車」三段異質鐵道串成一圈</strong>，從京都出發、繞比叡山到琵琶湖西岸、再從琵琶湖搭京阪京津線直通京都地下鐵回市區。</p>
+<pre><code>京都市區 ─┐
+         ↓ 叡山電鐵 + 叡山ケーブル + ロープウェイ
+       比叡山頂
+         ↓ 山內接駁巴士
+       延曆寺（東塔 + 西塔）
+         ↓ 坂本ケーブル（日本最長 2,025m）
+       穴太衆石垣街（路過）
+         ↓ 京阪石山坂本線
+       濱大津
+         ↓ 京阪京津線（路面 + 急坡 + 直通地下鐵）
+京都市區 ─┘
+</code></pre>
+<hr>
+<h2>流程表</h2>
+<blockquote>
+<p>住宿：樂天 STAY URBAN 四條河原町（已訂、連住 6/18–20）— 出發 / 收尾都在四條河原町，詳細動線見下方 Timeline。</p>
+</blockquote>
+<h3>階段 1 — 上山到延曆寺</h3>
+<blockquote>
+<p>✅ 班次已從官網確認（2026/05 版本）</p>
+</blockquote>
+<h4>班次重點</h4>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>平日</th>
+<th>假日（六日祝）</th>
+<th>末班</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>叡山ケーブル</td>
+<td><strong>首班 09:00</strong>、每 30 分</td>
+<td>首班 09:00、每 15 分</td>
+<td>18:15（下行 only）</td>
+</tr>
+<tr>
+<td>叡山ロープウェイ</td>
+<td><strong>首班 09:15</strong>、每 15 分</td>
+<td>首班 09:15、每 15 分</td>
+<td>18:00（下行 only）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>09:00 纜車 → 09:15 ロープウェイ <strong>無縫銜接</strong>，平日 / 假日都一樣。
+早於 09:00 沒有第一段交通工具，<strong>最早抵達延暦寺東塔 = ~09:36</strong>。</p>
+</blockquote>
+<h4>Timeline（6/19 五 平日）— 鎖定到 9:18 比叡山頂下車</h4>
+<blockquote>
+<p><strong>起點：樂天 STAY URBAN 四條河原町</strong>（河原町通 松原上）</p>
+</blockquote>
+<pre><code>═══ 鎖定段 ═══
+07:45 起床
+08:00 出門
+08:00 ~ 08:09 步行 9 分 → 京阪祇園四条駅
+08:09 ~ 08:22 京阪祇園四条 → 出町柳（京阪本線、~7 分 + 等車、¥280）
+08:22 ~ 08:25 步行 3 分 → 叡山電車出町柳駅
+08:31 ~ 08:45 出町柳 → 八瀨比叡山口（叡山電車普通車、14 分、¥280）⭐
+08:45 ~ 08:50 步行 5 分 → ケーブル八瀬駅
+08:50 ~ 09:00 緩衝 10 分
+09:00 ~ 09:09 ケーブル八瀬 → ケーブル比叡（叡山ケーブル、9 分、¥550）
+09:09 ~ 09:10 步行 1 分 → ロープ比叡駅
+09:10 ~ 09:15 等ロープウェイ
+09:15 ~ 09:18 ロープ比叡 → 比叡山頂（叡山ロープウェイ、3 分、¥350）
+
+═══ 以下浮動、當日視情況決定 ═══
+09:18 ~ 09:28  步行 10 分 → 比叡山頂巴士站
+09:30 ~ 09:36  比叡山內シャトルバス → 延暦寺東塔（1 日券 ¥1,000）
+09:36 ~ 12:00  延暦寺東塔 + 西塔（標準 2.5h）
+12:00 ~ 12:30  山上午餐
+12:30 ~ 12:40  步行 10 分 → ケーブル延暦寺駅
+13:00 ~ 13:11  坂本ケーブル下山
+13:11 ~ 13:30  穴太衆石垣街路過 → 京阪坂本比叡山口
+13:30 ~ 13:55  京阪石山坂本線 → 濱大津
+14:00 ~ 14:30  京阪京津線 → 京都市役所前 / 三条京阪 → 走回飯店
+</code></pre>
+<p><strong>鎖定段 = 樂天 STAY URBAN → 比叡山頂駅 = ~1h33m</strong>（緩衝充裕）</p>
+<blockquote>
+<p>🔍 <strong>比叡山內シャトルバス</strong>首班 / 班次密度官網沒明示、Pre-trip TODO 確認</p>
+</blockquote>
+<h3>階段 2 — 延曆寺停留（09:36 – 12:00）</h3>
+<blockquote>
+<p><strong>標準版：東塔 + 西塔</strong>（含步行移動，~2.5h）</p>
+</blockquote>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>時間</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>09:36 ~ 11:00</td>
+<td><strong>東塔</strong>：根本中堂（國寶）、大講堂、文殊樓、戒壇院、阿彌陀堂</td>
+</tr>
+<tr>
+<td>11:00 ~ 11:30</td>
+<td>山內步行 / 接駁巴士 → 西塔</td>
+</tr>
+<tr>
+<td>11:30 ~ 12:00</td>
+<td><strong>西塔</strong>：釋迦堂（轉法輪堂）、淨土院（最澄墓所）、弁慶水</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>三塔共通券 ¥1,000（東塔 + 西塔 + 横川）</li>
+<li>横川（最遠、最深）跳過 if 趕時間，或精簡只看東塔 1.5h</li>
+</ul>
+<h3>階段 3 — 山上午餐 + 下山（12:00 – 13:00）</h3>
+<pre><code>12:00 ~ 12:30 山上午餐
+   一隅会館（東塔附近）/ 延暦寺会館（食堂）
+   預算 ¥1,500 左右
+12:30 ~ 12:45 山內接駁 → 坂本ケーブル比叡山頂駅（=ケーブル延暦寺駅）
+12:45 ~ 12:56 坂本ケーブル下山（11 分）
+   ~ 日本最長纜車 2,025m
+   票價 ¥960 單程（往復 ¥1,830）
+   班次：08:00–17:30 整點 + 30 分（3–11 月）
+   ★ 上下行同時發車
+</code></pre>
+<h3>階段 4 — 坂本石垣街 + 京阪到濱大津（13:00 – 14:00）</h3>
+<pre><code>13:01 ~ 13:30 步行（穴太衆石垣街路過）
+   ~ ケーブル坂本駅 → 京阪坂本比叡山口駅 約 800m
+   ~ 全程穿過重伝建保存區、邊走邊看
+   ※ 順遊候選：舊竹林院（庭園抹茶 +30 分）、日吉大社（+30 分）
+13:30 ~ 13:55 京阪石山坂本線 → 濱大津
+   ~ (P 京阪) ~22 分
+   票價 ¥260
+</code></pre>
+<h3>階段 5 — 濱大津 + 京津線回京都（13:55 – 15:30）</h3>
+<pre><code>13:55 ~ 14:30 ※ 順遊候選：濱大津湖岸散步（なぎさ公園、+30–60 分）
+14:30 ~ 15:05 濱大津 → 京都市役所前（京阪京津線）
+   ~ (P 京阪京津線) ~35 分、直通京都地下鐵東西線
+   ★ 鐵道奇景：路面電車段 + 60‰ 急坡 + 隧道 + 直通地下鐵 四合一
+   票價 ¥640
+15:05 ~ 15:30 京都市役所前 → 飯店
+   ~ 步行 / 地下鐵
+</code></pre>
+<p><strong>預計回到京都市區：15:00–15:30</strong>
+<strong>晚餐前自由時間：1–2 小時</strong></p>
+<hr>
+<h2>預算估（單人、不含早晚餐）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>金額</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>出町柳 → 八瀬比叡山口（叡山電鐵）</td>
+<td>¥280</td>
+</tr>
+<tr>
+<td>叡山ケーブル（単程）</td>
+<td>¥550</td>
+</tr>
+<tr>
+<td>叡山ロープウェイ（単程）</td>
+<td>¥350</td>
+</tr>
+<tr>
+<td>比叡山內接駁巴士 1 日券</td>
+<td>¥1,000</td>
+</tr>
+<tr>
+<td>延曆寺三塔共通券</td>
+<td>¥1,000</td>
+</tr>
+<tr>
+<td>山上午餐</td>
+<td>¥1,500</td>
+</tr>
+<tr>
+<td>坂本ケーブル（單程）</td>
+<td>¥960</td>
+</tr>
+<tr>
+<td>京阪石山坂本線 → 濱大津</td>
+<td>¥260</td>
+</tr>
+<tr>
+<td>京阪京津線 → 京都市役所前</td>
+<td>¥640</td>
+</tr>
+<tr>
+<td><strong>小計</strong></td>
+<td><strong>¥6,540</strong></td>
+</tr>
+<tr>
+<td>順遊（舊竹林院抹茶 ¥830 / 日吉大社 ¥300）</td>
+<td>+¥0–1,130</td>
+</tr>
+<tr>
+<td><strong>總計</strong></td>
+<td><strong>¥6,540 – ¥7,670</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>約 NT$1,420–1,670</p>
+</blockquote>
+<hr>
+<h2>雨天備案</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>天氣</th>
+<th>對策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小雨</td>
+<td>照原計畫，纜車照常運行、延曆寺撐傘走</td>
+</tr>
+<tr>
+<td>大雨 / 濃霧</td>
+<td>縮短延曆寺停留、跳過順遊、直接京津線回京都，<strong>改進京都鐵博</strong>（一樣鐵道 + 室內）</td>
+</tr>
+<tr>
+<td>雷雨警報</td>
+<td>取消比叡山日、改室內備案（京都鐵博 + 京都國博 + 二条城等）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>行李 / 裝備</h2>
+<ul>
+<li>行李留飯店</li>
+<li>山上不寄物，輕便背包</li>
+<li>必備：雨傘 / 折疊雨衣（梅雨季）、水壺、輕食</li>
+<li>可選：御朱印帳（延曆寺有御朱印）</li>
+</ul>
+<hr>
+<h2>Pre-trip TODO</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> 比叡山內接駁巴士時刻表（出發前 1 週）</li>
+<li class="task"><input type="checkbox" disabled> 坂本ケーブル班次（每 30 分一班，但首末班要查）</li>
+<li class="task"><input type="checkbox" disabled> 京阪京津線時刻（直通京都地下鐵班次）</li>
+<li class="task"><input type="checkbox" disabled> 出發前再確認各段票價有無調漲（套票 vs 單買評估見文末，結論：單買較省）</li>
+<li class="task"><input type="checkbox" disabled> 山上食堂 6 月營業時間</li>
+</ul>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>路線</td>
+<td>✅ 鎖定</td>
+</tr>
+<tr>
+<td>時刻 baseline</td>
+<td>✅ 粗估完成</td>
+</tr>
+<tr>
+<td>預算</td>
+<td>✅ 粗估完成</td>
+</tr>
+<tr>
+<td>票券</td>
+<td>✅ 已查（2026/06）、單買較省（見文末評估）</td>
+</tr>
+<tr>
+<td>順遊取捨</td>
+<td>⏸ 當日當下決定</td>
+</tr>
+<tr>
+<td>雨天備案</td>
+<td>✅ 規劃完成</td>
+</tr>
+<tr>
+<td>哪一天執行</td>
+<td>⏳ 待整體 day 排定後決定</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>票券 / 套票 評估（2026/06 查證、日後再確認）</h2>
+<blockquote>
+<p><strong>結論</strong>：這條<strong>單向穿越</strong>（京都側上山、滋賀側下山）<strong>單買各段最省</strong>，套票不划算。日後出發前再確認價格有無調漲。</p>
+</blockquote>
+<h3>一、五段交通單買（= 套票涵蓋範圍、2026 已核實）</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>交通工具</th>
+<th>區間</th>
+<th>單價</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>叡山電車（普通車）</td>
+<td>出町柳 → 八瀬比叡山口</td>
+<td>¥280</td>
+</tr>
+<tr>
+<td>2</td>
+<td>叡山ケーブル（軌道纜車）</td>
+<td>ケーブル八瀬 → ケーブル比叡</td>
+<td>¥550</td>
+</tr>
+<tr>
+<td>3</td>
+<td>叡山ロープウェイ（空中纜車）</td>
+<td>ロープ比叡 → 比叡山頂</td>
+<td>¥350</td>
+</tr>
+<tr>
+<td>4</td>
+<td>比叡山內シャトルバス</td>
+<td>比叡山頂 ↔ 延暦寺各塔（1日券）</td>
+<td>¥1,200</td>
+</tr>
+<tr>
+<td>5</td>
+<td>坂本ケーブル（軌道纜車、日本最長 2,025m）</td>
+<td>ケーブル延暦寺 → ケーブル坂本</td>
+<td>¥960</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>單買小計</strong></td>
+<td></td>
+<td><strong>¥3,340</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<ul>
+<li>第 4 項巴士：本路線實際只需 1 趟（比叡山頂→東塔，東塔走得到 ケーブル延暦寺駅），若買單程（約 ¥250）而非 1日券，小計降到 <strong>~¥2,400</strong>。</li>
+<li>⚠️ 上方預算表的巴士寫 ¥1,000 為舊估，現價 1日券 <strong>¥1,200</strong>（江若交通）。</li>
+</ul>
+</blockquote>
+<h3>二、套票涵蓋外（單買 / 套票都要另付、對比較中性）</h3>
+<ul>
+<li>京阪本線 祇園四条 → 出町柳（上山前）：¥280</li>
+<li>京阪大津線 坂本比叡山口 → 濱大津 → 京都市役所前（下山後回京都）：預算抓 ¥260 + ¥640 = ¥900，疑高估（同一營運商 through-fare 可能較低），<strong>待查</strong></li>
+<li>延暦寺巡拝券（東塔 + 西塔 + 横川 共通）：¥1,000</li>
+</ul>
+<h3>三、套票選項（皆不划算 / 不適合本路線）</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>套票</th>
+<th>價格</th>
+<th>涵蓋</th>
+<th>對本路線</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>デジタル比叡山フリーパス</td>
+<td>¥3,500</td>
+<td>叡電 + 叡山ケーブル・ロープウェイ + シャトルバス + 坂本ケーブル + 江若バス（<strong>不含</strong>延暦寺拝観、京阪大津線）</td>
+<td>❌ 比單買 ¥3,340 還貴 ~¥160</td>
+</tr>
+<tr>
+<td>京都／びわ湖・比叡山頂往復切符</td>
+<td>¥3,000</td>
+<td>單側（京都 or 滋賀）來回 + 巡拝團體價</td>
+<td>❌ 本路線雙側穿越、用不到來回</td>
+</tr>
+<tr>
+<td>延暦寺＆ガーデンミュージアムセット券</td>
+<td>¥1,900</td>
+<td>巡拝券 + 山頂花園入園（<strong>無交通</strong>）</td>
+<td>❌ 沒排花園、且不含交通</td>
+</tr>
+<tr>
+<td>Ee Kippu（叡電一日券）</td>
+<td>¥1,200</td>
+<td>只叡電 出町柳~八瀬（不含纜車）</td>
+<td>❌ 只搭單程 ¥280、不划算</td>
+</tr>
+</tbody>
+</table></div>
+<h3>四、決策</h3>
+<ul>
+<li><strong>單買最省</strong>（套票較貴、且穿越路線每段只搭一次，省不到來回價值）。</li>
+<li>套票唯一優勢：<strong>一張 LINE 數位票</strong>、5 個轉乘點免逐段現場購票。若重便利、不在意多 ¥160，可考慮フリーパス。</li>
+</ul>
+<p><strong>✅ 最終定案：不買套票，單買 + 刷 Suica</strong></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>段</th>
+<th>付款方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>叡電 出町柳 → 八瀬比叡山口</td>
+<td>刷 <strong>Suica</strong></td>
+</tr>
+<tr>
+<td>京阪本線 祇園四条 → 出町柳（上山前）</td>
+<td>刷 <strong>Suica</strong></td>
+</tr>
+<tr>
+<td>叡山ケーブル + 叡山ロープウェイ</td>
+<td>八瀬站<strong>櫃台買紙票</strong></td>
+</tr>
+<tr>
+<td>山上シャトルバス</td>
+<td><strong>現場買票</strong> / 1日券</td>
+</tr>
+<tr>
+<td>坂本ケーブル</td>
+<td>延暦寺站<strong>櫃台買紙票</strong></td>
+</tr>
+<tr>
+<td>京阪大津線 坂本比叡山口 → 濱大津 → 京都市役所前（下山回京都）</td>
+<td>刷 <strong>Suica</strong></td>
+</tr>
+<tr>
+<td>延暦寺巡拝券</td>
+<td><strong>現場買 ¥1,000</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Suica（全國互通）= ICOCA，<strong>不需另辦 ICOCA</strong>；纜車 / 索道 / 山上巴士不收 IC、現場買票。出發前把 Suica 餘額儲足（全程大阪・京都市內交通都會刷）。</p>
+</blockquote>
+<h3>五、官網 / 來源（日後再確認價格）</h3>
+<ul>
+<li>京阪 比叡山・びわ湖デジタルきっぷ：https://www.keihan.co.jp/recommend/hieizanbiwako-digitalticket/</li>
+<li>叡山ケーブル・ロープウェイ 運賃（京福電鉄）：https://eizan.keifuku.co.jp/fare/</li>
+<li>坂本ケーブル 運賃：https://sakamoto-cable.jp/guide/</li>
+<li>比叡山内バス1日乗車券（江若交通）：https://www.kojak.co.jp/pickup/hieizan_1daypass/</li>
+<li>叡山電車官網：https://eizandensha.co.jp/tc/</li>
+</ul>
+</section>
+<section id="s4" data-date="2026-06-20">
+<h1>行程 6/20（六）— 京都東山日（退房 + 東山三線 + 換京都飯店）</h1>
+<blockquote>
+<p><strong>日期：2026/6/20（週六）✅ 定案</strong>
+出發飯店：樂天 STAY URBAN 四條河原町 → <strong>11:00 前退房</strong>
+入住飯店：Sekia Wagaya Hotel（西七條、京都駅西邊、~15:30 抵達）
+隔天 6/21 從 Sekia Wagaya 出發跑 嵐山 + 鐵博 → 移大阪</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p><strong>京都最後一日 = 退房日 + 東山一條線</strong>：
+清晨退房 → 行李寄物 → 伏見稻荷大社晨拜 → 清水寺 + 二三年坂 → 八坂神社 + 祇園 + 花見小路 → 取行李 → 移動到下個目的地</p>
+<pre><code>飯店退房 → 京都駅寄物
+   ↓ JR 奈良線（5 分）
+伏見稻荷大社（晨拜 + 上山 ~2h）
+   ↓ 京阪伏見稻荷 → 京阪清水五條（10 分）
+清水寺 + 二三年坂（~2h）
+   ↓ 步行下坡
+八坂神社 + 祇園 / 花見小路（~1.5h）
+   ↓ 巴士 / 步行
+京都駅 取行李 → 下個目的地
+</code></pre>
+<hr>
+<h2>流程表</h2>
+<h3>階段 1 — 退房 + 寄物（07:00 – 07:30）</h3>
+<blockquote>
+<p><strong>起點：樂天 STAY URBAN 四條河原町</strong>（河原町通 松原上）
+飯店規定 <strong>11:00 前退房</strong>、實際 7:00 自助 check-out 即可</p>
+</blockquote>
+<pre><code>06:30 起床
+07:00 退房（self check-out + 拖行李）
+07:00 ~ 07:09 步行 9 分 → 京阪祇園四条駅
+07:09 ~ 07:25 寄物（京阪祇園四条駅 coin locker、大型 ¥700/天）
+   ★ 滿位 fallback：搭京阪本線 1 站到清水五条 / 七條的 coin locker、或南到京都駅
+   或 Yamato 黑貓宅配到大阪飯店（前一晚跟飯店確認、¥1,500–2,500、隔天到）
+</code></pre>
+<h3>階段 2 — 伏見稻荷晨拜（07:30 – 09:30）</h3>
+<pre><code>07:25 ~ 07:37 京阪祇園四条 → 京阪伏見稻荷
+   ~ (P 京阪本線) ~12 分、¥220
+07:37 ~ 07:40 步行 → 伏見稻荷大社大鳥居
+07:40 ~ 09:30 千本鳥居 + 上山
+   ★ 24h 免費、清晨 7-8 點人最少、光線最美
+   標準路線：到「四ツ辻」展望台 + 京都市區俯瞰 ~1.5–2h 來回
+   完整登頂「一ノ峰」~2.5h 來回（體力選項）
+</code></pre>
+<h3>階段 3 — 清水寺 + 二三年坂（09:30 – 12:00）</h3>
+<pre><code>09:30 ~ 09:35 步行 → 京阪伏見稻荷駅
+09:35 ~ 09:42 京阪伏見稻荷 → 京阪清水五條
+   ~ (P 京阪本線) 1 站、~6 分、¥150
+09:42 ~ 09:55 步行上坡 → 清水寺（13 分）
+09:55 ~ 12:00 清水寺 + 二三年坂
+   ★ 清水寺 ¥400、6 月看點：清水の舞台、音羽の瀧、地主神社（修繕中）
+   ⚠️ 6/20 (六) 清水寺週六人多、想避擠盡量早入場（9:55 已是早場）
+   下山經過二年坂 → 三年坂（產寧坂）→ 邊走邊吃 / 拍照
+</code></pre>
+<h3>階段 4 — 八坂神社 + 祇園 + 午餐（12:00 – 14:30）</h3>
+<pre><code>12:00 ~ 12:30 八坂神社（免費、清水寺步行 15 分）
+12:30 ~ 13:30 午餐
+   清水 / 祇園 / 河原町附近選擇多
+13:30 ~ 14:30 祇園 + 花見小路 + 白川南通
+   ★ 純漫步、不買東西也成立
+   町家建築、石板路、運氣好遇藝伎
+</code></pre>
+<h3>階段 5 — 取行李 + 換到 Sekia Wagaya Hotel（14:30 – 15:30）</h3>
+<pre><code>14:30 ~ 14:40 從祇園走回京阪祇園四条駅 → 取行李
+14:40 ~ 15:00 京阪祇園四条 → 京都駅（京阪到七条 + 步行 / 巴士）
+              OR 祇園搭京都市バス 直達京都駅
+15:00 ~ 15:30 京都駅 → 巴士 / 步行到 Sekia Wagaya（西七條、~10–15 分）
+~15:30 抵達 Sekia Wagaya check-in
+晚上    河原町 / 木屋町晚餐（巴士 / JR 回市區、~20 分）
+       OR 京都駅周邊晚餐（飯店附近便利）
+</code></pre>
+<hr>
+<h2>預算估（單人、不含早晚餐）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>金額</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>京都駅寄物箱（中型）</td>
+<td>¥600</td>
+</tr>
+<tr>
+<td>京都駅 → JR 稻荷駅</td>
+<td>¥150</td>
+</tr>
+<tr>
+<td>京阪伏見稻荷 → 京阪清水五條</td>
+<td>¥220</td>
+</tr>
+<tr>
+<td>清水寺拜觀料</td>
+<td>¥400</td>
+</tr>
+<tr>
+<td>午餐</td>
+<td>¥1,500</td>
+</tr>
+<tr>
+<td>巴士回京都駅</td>
+<td>¥230</td>
+</tr>
+<tr>
+<td><strong>小計</strong></td>
+<td><strong>~¥3,100</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>約 NT$680（不含寄送 / 宅配 / 後續移動費用）</p>
+</blockquote>
+<hr>
+<h2>行李處理三種方案</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>費用</th>
+<th>優點</th>
+<th>缺點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. 京都駅寄物箱</strong></td>
+<td>¥400–700/天</td>
+<td>便宜、彈性</td>
+<td>早上競爭激烈、要搶大型箱</td>
+</tr>
+<tr>
+<td><strong>B. 飯店保管（早上保留、晚上回取）</strong></td>
+<td>免費</td>
+<td>不用拖行李</td>
+<td>晚上要回飯店取（行程要繞）</td>
+</tr>
+<tr>
+<td><strong>C. Yamato 黑貓宅配到下個飯店</strong></td>
+<td>¥1,500–2,500</td>
+<td>完全免拖、隔天上午到</td>
+<td>費用高、限隔天到</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>選擇邏輯</strong>：
+- 隔天住京都 / 大阪市區（近、寄物箱可勝任）→ <strong>A</strong>
+- 隔天住遠（神戶 / 姬路 / 高野山 宿坊）→ <strong>C</strong>（行李有時間先到）
+- 隔天還沒定 → 先預留 A，到時依情況改 C</p>
+<hr>
+<h2>雨天備案</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>天氣</th>
+<th>對策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小雨</td>
+<td>照原計畫、傘走、伏見稻荷山道有遮</td>
+</tr>
+<tr>
+<td>大雨</td>
+<td>縮短伏見稻荷（在大鳥居 + 千本鳥居入口拍即返、不上山）、清水 + 祇園主軸不變</td>
+</tr>
+<tr>
+<td>雷雨</td>
+<td>跳過伏見稻荷、改室內備案（京都鐵博 + 二条城 + 京都國博 + 漫畫博物館）</td>
+</tr>
+<tr>
+<td>6 月梅雨午後雷雨多</td>
+<td><strong>早上 7-12 點為穩定時段、安排核心景點在此</strong>（已 fit 此 plan）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>行李 / 裝備</h2>
+<ul>
+<li>退房時拖行李 → 寄物後輕裝</li>
+<li>走路多（清水→祇園 + 伏見稻荷上山）→ 穿運動鞋</li>
+<li>雨傘 / 折疊雨衣（梅雨季常備）</li>
+<li>水壺（伏見稻荷山上補水點少）</li>
+<li>護照 + 信用卡 + 現金 + 手機 + 行動電源</li>
+</ul>
+<hr>
+<h2>Pre-trip TODO</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> 確認飯店最早 check-out 時間（一般 7:00 起）</li>
+<li class="task"><input type="checkbox" disabled> 京都駅寄物箱位置（地下中央口、八条口等）+ 早上幾點滿位</li>
+<li class="task"><input type="checkbox" disabled> Yamato 黑貓宅配辦法（飯店多半可代寄、出發前一晚跟飯店確認）</li>
+<li class="task"><input type="checkbox" disabled> 隔天晚上住哪？→ 影響行李方案 A vs C</li>
+<li class="task"><input type="checkbox" disabled> 6 月伏見稻荷山上是否有上鎖區域 / 維修</li>
+<li class="task"><input type="checkbox" disabled> 清水寺主殿是否仍有修繕（地主神社 / 仁王門等）</li>
+</ul>
+<hr>
+<h2>隔天晚上住宿候選</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>候選</th>
+<th>影響</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大阪市區</td>
+<td>行李用 A 寄物箱、下午搭 JR / 阪急回大阪</td>
+</tr>
+<tr>
+<td>神戶 / 姬路</td>
+<td>行李用 C 黑貓宅配、下午跨城</td>
+</tr>
+<tr>
+<td>高野山宿坊</td>
+<td>行李用 C 必選（高野山遠）、下午搭南海高野線進山</td>
+</tr>
+<tr>
+<td>京都再住一晚</td>
+<td>行李用 A、下午自由活動</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>路線</td>
+<td>✅ 鎖定</td>
+</tr>
+<tr>
+<td>時刻 baseline</td>
+<td>✅ 粗估完成</td>
+</tr>
+<tr>
+<td>預算</td>
+<td>✅ 粗估完成</td>
+</tr>
+<tr>
+<td>雨天備案</td>
+<td>✅ 規劃完成</td>
+</tr>
+<tr>
+<td>行李處理</td>
+<td>🔍 待定（看隔天住哪）</td>
+</tr>
+<tr>
+<td>隔天住哪</td>
+<td>⏳ 待定</td>
+</tr>
+<tr>
+<td>哪一天執行</td>
+<td>⏳ 待定（建議比叡山日隔天）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>跟其他 day-block 的串接</h2>
+<ul>
+<li><strong>前一天</strong>：建議排「比叡山一日」（6/19 比叡山日），因為比叡山日累、隔天早起做東山一條線是輕鬆動線</li>
+<li><strong>隔天 / 隔幾天</strong>：依「隔天晚上住哪」決定後續走 G 神戶 / H 高野山 / E 大阪 等</li>
+</ul>
+</section>
+<section id="s5" data-date="2026-06-21">
+<h1>行程 6/21（日）— 京都嵐山 + 鐵博日（移大阪）</h1>
+<blockquote>
+<p><strong>日期：2026/6/21（週日）✅ 定案</strong>
+出發飯店：Sekia Wagaya Hotel（西七條、京都駅西邊）→ 早上退房
+抵達飯店：大阪 相鐵 Grand Fresa（日本橋、6/21–24 連住、✅ 已訂）
+對應 <code>03-景點.md</code> 嵐山 + 京都鐵博</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p><strong>「京都西郊半日 + 鐵博半日 + 移大阪」三段一日</strong>：嵐山天龍寺早上開門就衝、回京都駅取行李、午後鐵博整下午、晚上移大阪。</p>
+<pre><code>Sekia Wagaya（西七條）
+  ↓ JR 嵯峨野線 ~15 分
+嵐山（天龍寺 + 竹林 + 渡月橋）
+  ↓ JR 嵯峨野線 ~15 分
+京都駅 取行李 + 午餐
+  ↓ 步行 / 巴士 ~10 分
+京都鐵道博物館（4h+）
+  ↓ JR / 阪急 ~30 分
+大阪 → 飯店 check-in
+</code></pre>
+<hr>
+<h2>流程表</h2>
+<h3>階段 1 — 嵐山早上（07:00 – 10:30）</h3>
+<pre><code>07:00 起床
+08:00 退房 + 拖行李 → 走到 JR 西大路駅 OR 巴士到京都駅
+08:00 ~ 08:15 寄物（京都駅 coin locker、大型 ¥700）
+08:15 ~ 08:30 JR 京都駅 → JR 嵯峨嵐山（嵯峨野線、~15 分、¥240）
+08:30 ~ 08:45 步行到天龍寺（~15 分）
+09:00 ~ 10:00 ⭐ 天龍寺（8:30 開門、~1h、¥500）
+   - 曹源池庭園（借景嵐山）
+   - 大方丈
+10:00 ~ 10:30 竹林小徑 + 渡月橋（路過拍照、不細看）
+</code></pre>
+<h3>階段 2 — 移動回京都駅 + 午餐（10:30 – 12:00）</h3>
+<pre><code>10:30 ~ 10:50 嵯峨嵐山 → JR 京都駅（~15 分）
+10:50 ~ 11:30 京都駅周邊午餐（拉麵小路 / 伊勢丹 / 駅內餐廳）
+11:30 ~ 11:45 步行 / 巴士到京都鐵博（~10–15 分）
+              ★ 鐵博內有 coin locker、入場後寄行李就好
+</code></pre>
+<h3>階段 3 — 京都鐵博（12:00 – 16:30）</h3>
+<pre><code>12:00 鐵博開放（10:00–17:00、入場截止 16:30）
+12:00 ~ 16:30 ⭐ 京都鐵博（4.5h、鐵道控完整）
+   - 本館 1F 53 輛實車展示
+   - 本館 2F 駕駛模擬器（抽選 + 排隊）
+   - 本館 3F JR Tower 觀景（看京都站列車進出）
+   - 扇形機關車庫（12 輛蒸汽機車）
+   - SL 蒸汽機車試乘（¥300、來回 10 分）
+   - Diorama 大型鐵道模型秀（每天 4 場）
+</code></pre>
+<h3>階段 4 — 移動到大阪（16:30 – 18:00）</h3>
+<pre><code>16:30 鐵博閉館 → 步行 / 巴士到京都駅
+~17:00 京都駅 取行李
+17:00 ~ 17:30 JR 京都駅 → JR 大阪駅（新快速 ~30 分、¥580）
+       OR 阪急烏丸 → 阪急梅田（~45 分、¥410）
+17:30 ~ 18:00 步行 / 地鐵御堂筋線到難波 → 大阪飯店 check-in
+晚上    難波 / 道頓堀晚餐
+</code></pre>
+<p><strong>整段 ~10h</strong>（07:00 起床 → 18:00 抵達大阪飯店）</p>
+<hr>
+<h2>預算估（單人、不含早晚餐）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>金額</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>京都駅 寄物（大型）</td>
+<td>¥700</td>
+</tr>
+<tr>
+<td>京都駅 → 嵐山 JR 嵯峨野線（單程）</td>
+<td>¥240</td>
+</tr>
+<tr>
+<td>天龍寺 拜觀料</td>
+<td>¥500</td>
+</tr>
+<tr>
+<td>嵐山 → 京都駅 JR</td>
+<td>¥240</td>
+</tr>
+<tr>
+<td>京都駅午餐</td>
+<td>¥1,200</td>
+</tr>
+<tr>
+<td>京都鐵博 入場</td>
+<td>¥1,500</td>
+</tr>
+<tr>
+<td>SL 蒸汽機車試乘（可選）</td>
+<td>¥300</td>
+</tr>
+<tr>
+<td>京都 → 大阪 JR 新快速</td>
+<td>¥580</td>
+</tr>
+<tr>
+<td>大阪市內地鐵（到飯店）</td>
+<td>¥230</td>
+</tr>
+<tr>
+<td><strong>小計</strong></td>
+<td><strong>~¥5,490</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>約 NT$1,200</p>
+</blockquote>
+<hr>
+<h2>6/21 (日) 注意事項</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>注意</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>天龍寺週日</strong></td>
+<td>8:30 開門、週日早上 9:00 後開始擠、9:00 前到最佳</td>
+</tr>
+<tr>
+<td><strong>竹林小徑週日</strong></td>
+<td>11:00 後人爆、9-10 點還算 OK</td>
+</tr>
+<tr>
+<td><strong>京都鐵博週日</strong></td>
+<td>比平日擠、SL 試乘要排隊、模擬器抽選競爭</td>
+</tr>
+<tr>
+<td><strong>6/21 (日) 京都→大阪 JR</strong></td>
+<td>班次密、不影響</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>雨天備案</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>天氣</th>
+<th>對策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小雨</td>
+<td>嵐山天龍寺撐傘走、竹林小徑撐傘走也很美</td>
+</tr>
+<tr>
+<td>大雨</td>
+<td>縮短嵐山（只看天龍寺、跳過竹林）、提早到鐵博避雨（鐵博全室內）</td>
+</tr>
+<tr>
+<td>雷雨</td>
+<td>跳過嵐山、直接從 Sekia Wagaya 走 15 分到鐵博、12:00 一開門就進</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>行李 / 裝備</h2>
+<ul>
+<li>早上 Sekia Wagaya 退房 → 行李拖到京都駅寄物</li>
+<li>嵐山輕裝（小包）</li>
+<li>鐵博入場前可在館內 coin locker 寄物</li>
+<li>結束鐵博取行李 → 移大阪</li>
+<li>鐵博內有飲水機、可帶水</li>
+</ul>
+<hr>
+<h2>Pre-trip TODO</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> 天龍寺 週日 開門時間（8:30 / 9:00 視季節）</li>
+<li class="task"><input type="checkbox" disabled> JR 嵯峨野線 京都駅 → 嵯峨嵐山駅 早上班次（每 10–15 分一班）</li>
+<li class="task"><input type="checkbox" disabled> 京都鐵博 SL 試乘 是否需預約 / 售票時間</li>
+<li class="task"><input type="checkbox" disabled> 京都鐵博 6/21 是否有特展 / 活動 / 排隊熱點</li>
+</ul>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>路線</td>
+<td>✅ 鎖定</td>
+</tr>
+<tr>
+<td>時刻 baseline</td>
+<td>✅ 粗估完成</td>
+</tr>
+<tr>
+<td>預算</td>
+<td>✅ 粗估完成</td>
+</tr>
+<tr>
+<td>雨天備案</td>
+<td>✅ 規劃完成</td>
+</tr>
+<tr>
+<td>大阪飯店 6/21</td>
+<td>✅ 已訂（相鐵 6/21–24 連住）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>串接</h2>
+<ul>
+<li><strong>前一天</strong>：6/20 (六) Day 4 京都東山日 → 換到 Sekia Wagaya</li>
+<li><strong>隔天</strong>：6/22 (一) Day 6 跨城市 day trip（從大阪飯店出發）</li>
+</ul>
+</section>
+<section id="s6" data-date="2026-06-22">
+<h1>行程 6/22（一）— 跨城市 day trip（待拍板）</h1>
+<blockquote>
+<p><strong>日期：2026/6/22（週一）</strong>
+飯店：相鐵 Grand Fresa（日本橋）→ 不換房（連住 6/21–24），當天從大阪出發、晚回相鐵
+草稿狀態：⏳ <strong>候選未拍板</strong>——神戶 / 姬路 / 高野山 / 滋賀東岸 四選一
+對應 <code>99-最終行程.md</code> Day 6</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p>唯一一天跨城市遠征，從大阪（相鐵・日本橋）出發、晚上回相鐵。決定哪個主軸後再寫正式 timeline。</p>
+<hr>
+<h2>候選比較（依你偏好：鐵道控 + 神社寺廟胃口大 + 不購物 + 不要展望台）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>候選</th>
+<th>從大阪</th>
+<th>鐵道</th>
+<th>寺廟/神社</th>
+<th>撞別天?</th>
+<th>對你的 fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⭐ <strong>高野山</strong></td>
+<td>難波南海直結 ~1.5h</td>
+<td><strong>南海高野線急行 + 鋼索線纜車</strong>（車程即體驗）</td>
+<td>奧之院 + 壇上伽藍 + 金剛峯寺（真言宗聖地、World Heritage）</td>
+<td>無</td>
+<td><strong>鐵道+寺廟雙命中、與難波 base 最順</strong>（首推）</td>
+</tr>
+<tr>
+<td><strong>姬路 + 書寫山</strong></td>
+<td>JR / 山陽 ~60 分</td>
+<td>山陽電鐵直通特急、圓教寺纜車</td>
+<td>國寶姬路城 + 書寫山圓教寺（山寺）</td>
+<td>無</td>
+<td>換「城」口味、不撞京都寺廟</td>
+</tr>
+<tr>
+<td><strong>滋賀東岸</strong></td>
+<td>大阪→彥根 ~90 分</td>
+<td>近江鐵道（小眾私鐵）</td>
+<td>彥根城(國寶) + 安土城跡 + 多賀大社</td>
+<td>無（但方向偏京都側）</td>
+<td>戰國 + 鐵道控香，但離難波 base 較不順</td>
+</tr>
+<tr>
+<td>神戶</td>
+<td>三宮 ~25 分（最近）</td>
+<td>阪急 / 阪神</td>
+<td>少</td>
+<td>無</td>
+<td>異人館/夜景/溫泉/逛街偏多、寺廟少，<strong>fit 最弱</strong>（亮點僅森林植物園紫陽花）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>我的建議排序：<strong>高野山 ≥ 姬路 &gt; 滋賀 &gt; 神戶</strong>（理由見上「對你的 fit」）。</p>
+</blockquote>
+<hr>
+<h2>流程表 ⏳ 待拍板後填</h2>
+<pre><code>⏳ 待選定主軸（上表四選一）後排：
+   - 早上 相鐵（日本橋）出發 → 目的地
+   - 白天 主要景點
+   - 晚上 回相鐵
+</code></pre>
+<hr>
+<h2>共通備註</h2>
+<ul>
+<li>票券：選定後再算（高野山有「高野山・世界遺産きっぷ」；姬路看 JR / 山陽；滋賀看近江鐵道一日券）——比照 <code>0619</code> 的「套票 vs 單買」邏輯評估。</li>
+<li>行李：當天往返、不用搬行李（相鐵連住）。</li>
+<li>雨天：梅雨季，山岳路線（高野山）受天氣影響較大，雨天備案另想。</li>
+</ul>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主軸選定</td>
+<td>⏳ <strong>待拍板（四選一）</strong></td>
+</tr>
+<tr>
+<td>路線 / 時刻 / 預算 / 票券</td>
+<td>⏳ 待選定後</td>
+</tr>
+<tr>
+<td>住宿</td>
+<td>✅ 相鐵（連住、不換房）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>串接</h2>
+<ul>
+<li><strong>前一天</strong>：6/21（日）嵐山 + 鐵博日 → 晚移大阪入住相鐵（見 <code>行程-0621</code>）</li>
+<li><strong>隔天</strong>：6/23（二）大阪南區一日（見 <code>行程-0623</code>）</li>
+</ul>
+</section>
+<section id="s7" data-date="2026-06-23">
+<h1>行程 6/23（二）— 大阪南區一日（大阪城 + 黑門 + 心齋橋 + 道頓堀）</h1>
+<blockquote>
+<p><strong>日期：2026/6/23（週二）✅ 定案</strong>
+飯店：相鐵 Grand Fresa（日本橋、連住 6/21–24）→ 不換房、整天以飯店為中心
+草稿狀態：✅ 路線 / 時刻 / 預算 / 雨天備案完成（原寫在 <code>99</code> Day 7 anchor、now 獨立成檔）
+對應 <code>99-最終行程.md</code> Day 7</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p><strong>大阪市區唯一一天 = 大阪城 + 黑門午餐 + 心齋橋購物 + 道頓堀夜</strong>。相鐵就在日本橋（黑門市場旁），黑門 / 道頓堀 / 心齋橋全步行可達，只有大阪城要搭地鐵。<strong>這天是全程唯一的購物日（買衣服）</strong>。</p>
+<pre><code>相鐵（日本橋）─(地鐵 ~15分)→ 大阪城（晨、紫陽花）
+   ↓ 地鐵回日本橋
+黑門市場（午餐、飯店旁）→ 心齋橋筋（購物 4h）→ 回飯店放戰利品
+   ↓ 步行
+道頓堀（Glico/戎橋）→ 晚餐 + 法善寺橫丁居酒屋 → 走回相鐵
+</code></pre>
+<hr>
+<h2>流程表</h2>
+<h3>階段 1 — 大阪城（09:00 – 11:00）</h3>
+<pre><code>08:00        起床（相鐵 Grand Fresa、日本橋）
+08:45        出發 →〔堺筋線 → 中央線〕→ 森ノ宮（~15 分、刷 Suica）
+09:00~11:00  ⭐ 大阪城（¥600）
+             - 公園 + 西之丸庭園（**6 月紫陽花季 ✨**）
+             - 天守閣（早上人較少）
+</code></pre>
+<h3>階段 2 — 黑門市場 午餐（11:20 – 13:00）</h3>
+<pre><code>11:00~11:20  森ノ宮 → 日本橋（地鐵 ~15 分）→ 黑門（**飯店旁、走 3–5 分**）
+11:20~13:00  ⭐ 黑門市場（午餐 + 邊走邊吃；海鮮丼 / 和牛串 / 河豚 等）
+             ★ 雨天王牌（有頂商店街）
+</code></pre>
+<h3>階段 3 — 心齋橋 / 難波 購物（13:00 – 17:00）</h3>
+<pre><code>13:00~17:00  心齋橋筋 / 難波 購物（~4h）
+             ★ 全程唯一購物日：**買衣服**
+             ★ 拱廊商店街、耐雨
+17:00~17:20  走回相鐵 扔戰利品 + 短歇（飯店近）
+</code></pre>
+<h3>階段 4 — 道頓堀（17:30 – 19:00）</h3>
+<pre><code>17:30~19:00  ⭐ 道頓堀（飯店走 ~5 分）
+             - Glico 跑跑人看板 + 戎橋 + 食倒太郎
+             - 邊走邊拍、傍晚到入夜燈光最好
+</code></pre>
+<h3>階段 5 — 晚餐 + 夜飲（19:00 – 21:00+）</h3>
+<pre><code>19:00~21:00  道頓堀晚餐 + **法善寺橫丁居酒屋**（你愛的夜飲、石板小巷氛圍）
+21:00+       步行回相鐵（~5 分）
+</code></pre>
+<p><strong>整段以飯店（日本橋）為圓心，傍晚後全步行、零趕車。</strong></p>
+<hr>
+<h2>預算估（單人、含三餐概估）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>金額</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>地鐵（日本橋 ↔ 大阪城 來回）</td>
+<td>~¥460（刷 Suica）</td>
+</tr>
+<tr>
+<td>大阪城 天守閣</td>
+<td>¥600</td>
+</tr>
+<tr>
+<td>西之丸庭園</td>
+<td>¥200</td>
+</tr>
+<tr>
+<td>黑門市場 午餐（邊走邊吃）</td>
+<td>¥2,000–3,000</td>
+</tr>
+<tr>
+<td>道頓堀晚餐 + 居酒屋</td>
+<td>¥3,000–4,000</td>
+</tr>
+<tr>
+<td><strong>小計（不含購物）</strong></td>
+<td><strong>~¥6,300–8,300</strong></td>
+</tr>
+<tr>
+<td>購物（買衣服）</td>
+<td>TBD（你抓預算）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>雨天備案（梅雨）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>天氣</th>
+<th>對策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小雨</td>
+<td>照原計畫；黑門 + 心齋橋筋 + 難波地下街 + 道頓堀 大多有頂 / 拱廊</td>
+</tr>
+<tr>
+<td>大雨</td>
+<td>大阪城縮短（公園撐傘、進天守閣室內為主）；下午購物移到室內拱廊 / 百貨；道頓堀傘走</td>
+</tr>
+<tr>
+<td>雷雨</td>
+<td>跳過大阪城、整天泡心齋橋 / 難波室內 + 黑門 + 道頓堀（全南區、耐雨）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>Pre-trip TODO</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> 大阪城天守閣 6 月開放時間 / 排隊狀況</li>
+<li class="task"><input type="checkbox" disabled> 西之丸庭園 紫陽花 開放與最佳花況</li>
+<li class="task"><input type="checkbox" disabled> 心齋橋 買衣服目標店家 / 品牌（先列清單，當天有效率）</li>
+<li class="task"><input type="checkbox" disabled> 道頓堀晚餐店 / 法善寺橫丁居酒屋（要不要預約）</li>
+<li class="task"><input type="checkbox" disabled> 退稅備忘（買滿 ¥5,000、帶護照）</li>
+</ul>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>路線</td>
+<td>✅ 鎖定（以相鐵日本橋為圓心）</td>
+</tr>
+<tr>
+<td>時刻 baseline</td>
+<td>✅ 粗估完成</td>
+</tr>
+<tr>
+<td>預算</td>
+<td>✅ 粗估完成（購物另計）</td>
+</tr>
+<tr>
+<td>雨天備案</td>
+<td>✅ 規劃完成</td>
+</tr>
+<tr>
+<td>住宿</td>
+<td>✅ 相鐵（連住、不換房）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>串接</h2>
+<ul>
+<li><strong>前一天</strong>：6/22（一）跨城市 day trip（從相鐵出發、待拍板）</li>
+<li><strong>隔天</strong>：6/24（三）出發日 → 相鐵退房 → 難波 → 17:30 Rapi:t → KIX → 20:55 起飛</li>
+</ul>
+</section>
+<section id="s8" data-date="2026-06-24">
+<h1>行程 6/24（三）— 出發日（大阪 → KIX → 台北）</h1>
+<blockquote>
+<p><strong>日期：2026/6/24（週三）</strong>
+飯店：相鐵 Grand Fresa（日本橋）→ 11:00 前退房
+草稿狀態：✅ 往機場 + 回程班機已定　⏳ 上午活動待排
+對應 <code>99-最終行程.md</code> Day 8</p>
+</blockquote>
+<hr>
+<h2>主題</h2>
+<p><strong>最後一天</strong>：相鐵退房 → 上午大阪自由（半天、待排）→ 下午往 KIX → 20:55 AirAsia X 回台北。重點是<strong>留足 buffer 趕班機</strong>、別排太遠太滿。</p>
+<pre><code>相鐵（日本橋）11:00 退房（行李寄放）
+   ↓ 上午 ⏳ 待排（半天、大阪近郊輕量）
+   ↓ ~16:30 取行李
+難波 ─(南海 Rapi:t β ~37分)→ 18:07 KIX T1 → check-in/安檢
+20:55 AirAsia X D7379 → 23:05 TPE
+</code></pre>
+<hr>
+<h2>流程表</h2>
+<h3>階段 1 — 上午 ⏳ 待排</h3>
+<pre><code>~11:00  相鐵 退房（行李寄飯店 or 難波 / 日本橋 coin locker）
+上午    ⏳ 待排（半天、輕量；不撞前面去過的點）
+</code></pre>
+<blockquote>
+<p>原則：① 留足趕機 buffer（~16:30 前要回來取行李）；② 別排遠程；③ 可補大阪南區漏網、最後採買、或近處神社 / 鐵道小點。</p>
+</blockquote>
+<h3>階段 2 — 往機場 + 回程班機（✅ 定）</h3>
+<pre><code>~16:30  從大阪市區出發（取行李）
+~17:00  相鐵 → 難波駅（走 ~5–8 分）
+17:30   難波 → 南海 Rapi:t β → KIX（¥1,490、~37 分）
+         OR 空港急行 ¥970（~45 分、刷 Suica、省錢）
+18:07   抵 KIX T1 → check-in + 安檢
+20:55   AirAsia X D7379 起飛 → 23:05 TPE
+</code></pre>
+<blockquote>
+<p>備案：想保守 → 搭 17:00 早一班 Rapi:t（~17:37 到）；末班空港急行 18:24 到（17:30 沒趕上仍有後續）。
+回程行李：AirAsia X 已加購 20kg 託運。</p>
+</blockquote>
+<hr>
+<h2>Pre-trip TODO</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> <strong>確認 AirAsia X D7379 在 KIX 航廈</strong>（記錄為 T1；若改 T2 需 T1→T2 接駁巴士、要多抓時間）</li>
+<li class="task"><input type="checkbox" disabled> 相鐵行李寄放 / 難波 coin locker 方案</li>
+<li class="task"><input type="checkbox" disabled> AirAsia 線上 check-in（可提前、省機場時間）</li>
+<li class="task"><input type="checkbox" disabled> 決定上午活動（解鎖 階段 1）</li>
+</ul>
+<hr>
+<h2>完成度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>往機場 + 回程班機</td>
+<td>✅ 定（南海 → KIX、20:55 起飛）</td>
+</tr>
+<tr>
+<td>上午活動</td>
+<td>⏳ 待排</td>
+</tr>
+<tr>
+<td>住宿</td>
+<td>✅ 相鐵（前一晚）</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>串接</h2>
+<ul>
+<li><strong>前一天</strong>：6/23（二）大阪南區一日 → 住相鐵（見 <code>行程-0623</code>）</li>
+<li><strong>回程結束</strong>：23:05 抵 TPE 桃園 T1</li>
+</ul>
+</section>
+<section id="s9">
+<h1>00 - 基本資訊</h1>
+<p>旅遊的核心參數，這份檔案會被其他檔案引用。</p>
+<hr>
+<h2>旅遊日期（暫定，依候選航班 #3）</h2>
+<ul>
+<li><strong>出發</strong>：2026/6/17（週三）　TPE 02:00 起飛 → KIX 09:30 抵達（T'way Air，經大邱轉機）</li>
+<li><strong>回程</strong>：2026/6/24（週三）　KIX 20:55 起飛 → TPE 23:05 抵達（AirAsia X 直飛）</li>
+<li><strong>天數</strong>：<strong>8 天 7 夜</strong>（在日本實際可用時間 ≈ 6/17 上午 → 6/24 傍晚，約 7 個整天）</li>
+</ul>
+<blockquote>
+<p>6 月關西氣候 reference：梅雨季中後段（約 6/上旬入梅、7/中旬出梅），月均溫 22–27°C，午後雷雨機率高。排行程時要考慮室內備案。
+<strong>注意</strong>：去程凌晨 02:00 起飛 → 機捷末班車約 23:30，需提前一晚過夜或計程車到桃機。</p>
+</blockquote>
+<hr>
+<h2>同行人數</h2>
+<ul>
+<li><strong>1 人（單人旅行）</strong></li>
+</ul>
+<blockquote>
+<p>單人旅行影響：住宿房型偏單人房 / 商務型、餐廳預約彈性大、可走密集行程、安全與預算自由度高。</p>
+</blockquote>
+<hr>
+<h2>預算</h2>
+<h3>已確認 / 預估項目</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>項目</th>
+<th>預估金額 (TWD)</th>
+<th>狀態</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>機票（來回，含 20kg 行李）</td>
+<td>10,000</td>
+<td>粗估</td>
+<td>T'way 去 + AirAsia X 回，實際 NT$9,696，取整</td>
+</tr>
+<tr>
+<td>2</td>
+<td>旅遊保險</td>
+<td>750</td>
+<td>粗估</td>
+<td>待確認方案</td>
+</tr>
+<tr>
+<td>3</td>
+<td>飯店：大阪 The OneFive 新世界（1 晚 6/17-18）</td>
+<td>~670</td>
+<td>✅ 已訂</td>
+<td>USD 21.26、Agoda、6/12 扣款（卡末四碼 7704）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>飯店：京都樂天 STAY URBAN（2 晚 6/18-20）</td>
+<td>~2,520</td>
+<td>✅ 已訂</td>
+<td>JPY 11,524、Agoda、6/13 扣款幸福 M 卡</td>
+</tr>
+<tr>
+<td>5</td>
+<td>飯店：京都 Sekia Wagaya（1 晚 6/20-21）</td>
+<td>~970</td>
+<td>✅ 已訂</td>
+<td>JPY 4,500、Booking.com、現場付現</td>
+</tr>
+<tr>
+<td>6</td>
+<td>飯店：大阪相鐵 Grand Fresa（3 晚 6/21-24）</td>
+<td>3,637</td>
+<td>✅ 已訂</td>
+<td>TWD 3,637（¥18,492）、Booking.com、6/17 扣款（Mastercard 7704）、6/20 前免費取消</td>
+</tr>
+<tr>
+<td>7</td>
+<td>飯店附加費 / 城市稅（樂天 ¥400 + 大阪各飯店住宿稅現場）</td>
+<td>~175</td>
+<td>到店現金</td>
+<td>概估</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>小計</strong></td>
+<td><strong>~18,722</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h3>待估項目</h3>
+<ul>
+<li>住宿：✅ 已全數訂齊（7 晚、見 <code>02-住宿.md</code>）</li>
+<li>市內交通（IC 卡儲值、周遊券）</li>
+<li>跨城市交通（京都 / 奈良 / 神戶 etc.）</li>
+<li>餐費（每日 × 8 天）</li>
+<li>景點門票</li>
+<li>購物 / 伴手禮</li>
+<li>雜支（網路 eSIM、行李寄物、機場接駁）</li>
+<li>出國前桃機過夜 / 計程車</li>
+</ul>
+<h3>規劃參數</h3>
+<ul>
+<li>總預算：TBD</li>
+<li>每日預算 level：TBD（背包 / 中等 / 舒適 / 高端）</li>
+<li>是否願意為特定餐廳/體驗加碼：TBD</li>
+</ul>
+<hr>
+<h2>旅遊風格偏好</h2>
+<p><strong>主軸：神社寺廟 + 鐵道體驗、拚密集行程的單人男性自由行</strong></p>
+<ul>
+<li class="task"><input type="checkbox" disabled> 美食重度（願意排隊、預約、跨區去吃）— 普通；偏好夜飲（居酒屋）&gt; 排隊名店</li>
+<li class="task done"><input type="checkbox" checked disabled> 景點打卡 — <strong>神社寺廟 ◎ 胃口大</strong>；<strong>展望台 ✗</strong>（晴空塔 / 東京鐵塔已飽和；HARUKAS、梅田空中庭園已剔除）</li>
+<li class="task"><input type="checkbox" disabled> 文青漫步（咖啡廳、書店、選物店、中崎町、福島）— 低</li>
+<li class="task"><input type="checkbox" disabled> 購物 — <strong>不愛逛街購物</strong>；唯一例外：6/23 心齋橋買衣服</li>
+<li class="task"><input type="checkbox" disabled> 動漫 / 偶像 / 御宅文化（日本橋、難波）— 低（日本橋電器街已剔除）</li>
+<li class="task done"><input type="checkbox" checked disabled> <strong>鐵道迷 ◎ 強屬性</strong> — 已選比叡山三段纜車穿越、嵐電、京都鐵博、阪堺、京阪京津線等多項</li>
+<li class="task done"><input type="checkbox" checked disabled> 自然風景（嵐山、奈良公園）+ <strong>6 月紫陽花</strong>（花期完美命中、想看）</li>
+<li class="task"><input type="checkbox" disabled> 溫泉 — 非主訴求</li>
+<li class="task"><input type="checkbox" disabled> 環球影城 USJ — <strong>❌ 已剔除</strong>（太貴 + 獨旅不適合）</li>
+<li class="task done"><input type="checkbox" checked disabled> 居酒屋夜生活 — 喜歡（河原町 / 木屋町 / 先斗町）</li>
+</ul>
+<hr>
+<h2>Wishlist（必訪 / 必吃）</h2>
+<p>不分優先序，想到就丟：</p>
+<h3>必訪景點</h3>
+<p>→ 已確認 12 個景點見 <code>03-景點.md</code> ✅ 總表；已排入 day-block 見 <code>99-最終行程.md</code></p>
+<h3>必吃餐廳</h3>
+<ul>
+<li>TBD（type-level 候選見 <code>04-美食.md</code>，尚無鎖定店家）</li>
+</ul>
+<h3>必買 / 必體驗</h3>
+<ul>
+<li>鐵道體驗（強屬性）：見 <code>03-景點.md</code> 各章「鐵道體驗」section</li>
+<li>6 月紫陽花（花期完美命中）</li>
+<li>6/23 心齋橋買衣服（唯一購物需求）</li>
+</ul>
+<hr>
+<h2>行程強度</h2>
+<ul>
+<li>一天大約幾個景點：<strong>密集</strong>（拚命三郎、早起晚回，每日約 3–5 個點 + 夜飲）</li>
+<li>步行 vs. 大眾運輸 vs. 計程車 偏好：<strong>大眾運輸（鐵道）為主</strong> + 步行；計程車僅備援</li>
+<li>是否要排「放鬆日」：<strong>否</strong>（不安排休息日）</li>
+</ul>
+</section>
+<section id="s10">
+<h1>01 - 交通</h1>
+<hr>
+<h2>機票（去 6/17（三）/ 回 6/24（三），1 人，需 20kg 託運）</h2>
+<blockquote>
+<p>機票比價已定案（候選航空 / 票種比價、其他候選航班已清）；下方為實際訂位。</p>
+</blockquote>
+<h2>已訂航班</h2>
+<h3>來回組合：6/17（三）T'way Air ＋ 6/24（三）AirAsia X 　✅ <strong>定案</strong></h3>
+<h4>去程　台北 → 大阪　6/17（週三）</h4>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>段</th>
+<th>日期</th>
+<th>時刻</th>
+<th>機場</th>
+<th>航班</th>
+<th>機型</th>
+<th>艙等</th>
+<th>飛行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>6/17</td>
+<td>02:00 出發</td>
+<td>TPE 桃園 T1</td>
+<td>T'way <strong>TW664</strong></td>
+<td>B737-800</td>
+<td>經濟艙 T</td>
+<td>2h25m</td>
+</tr>
+<tr>
+<td>1</td>
+<td>6/17</td>
+<td>05:25 抵達</td>
+<td>TAE 大邱機場</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>–</td>
+<td>–</td>
+<td>轉機</td>
+<td>大邱</td>
+<td></td>
+<td></td>
+<td></td>
+<td>2h35m</td>
+</tr>
+<tr>
+<td>2</td>
+<td>6/17</td>
+<td>08:00 出發</td>
+<td>TAE 大邱機場</td>
+<td>T'way <strong>TW311</strong></td>
+<td>B737-800</td>
+<td>經濟艙 T</td>
+<td>1h30m</td>
+</tr>
+<tr>
+<td>2</td>
+<td>6/17</td>
+<td>09:30 抵達</td>
+<td>KIX 關西 T1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h4>回程　大阪 → 台北　6/24（週三）</h4>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>段</th>
+<th>日期</th>
+<th>時刻</th>
+<th>機場</th>
+<th>航班</th>
+<th>機型</th>
+<th>艙等</th>
+<th>飛行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>6/24</td>
+<td>20:55 出發</td>
+<td>KIX 關西 T1</td>
+<td>AirAsia X <strong>D7379</strong></td>
+<td>A330-300</td>
+<td>經濟艙 K</td>
+<td>3h10m</td>
+</tr>
+<tr>
+<td>1</td>
+<td>6/24</td>
+<td>23:05 抵達</td>
+<td>TPE 桃園 T1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h4>票價</h4>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>金額</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基本票價</td>
+<td>NT$4,122</td>
+</tr>
+<tr>
+<td>稅金與其他費用</td>
+<td>NT$4,970</td>
+</tr>
+<tr>
+<td>附加（托運行李 20kg）</td>
+<td>NT$1,045</td>
+</tr>
+<tr>
+<td>折扣</td>
+<td>-NT$440</td>
+</tr>
+<tr>
+<td><strong>總額</strong></td>
+<td><strong>NT$9,696</strong>（原價 NT$10,137）</td>
+</tr>
+</tbody>
+</table></div>
+<h4>⚠️ 重要提醒</h4>
+<ul>
+<li><strong>行李不可直掛</strong>：去程在大邱（TAE）要領出行李 → 重新 check-in 託運 → 再過韓國境內安檢。轉機 2h35m 算夠，但要把握時間。</li>
+<li><strong>6/16（週二）晚上要先到桃機</strong>：去程 02:00 起飛，桃機建議 23:30 前抵達。機捷末班車約 23:30，注意末班；可選機場過夜、計程車、或前一晚住機場附近旅館。</li>
+<li><strong>桃園機場 T1</strong>（去程出發 / 回程抵達）。</li>
+<li>回程 KIX 20:55 起飛，當天晚上預留時間到機場（建議 18:30 前到 KIX）。</li>
+</ul>
+<hr>
+<h2>關西機場 ↔ 大阪市區</h2>
+<p>幾個主要選項，等決定住宿區域再來決定哪個最划算：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>到達區域</th>
+<th>時間</th>
+<th>票價</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>南海電鐵特急 Rapi:t</td>
+<td>難波</td>
+<td>~38 分</td>
+<td>¥1,490</td>
+<td>觀光客愛用，藍色子彈造型</td>
+</tr>
+<tr>
+<td>南海電鐵空港急行</td>
+<td>難波</td>
+<td>~45 分</td>
+<td>¥970</td>
+<td>CP 值高</td>
+</tr>
+<tr>
+<td>JR 關空快速</td>
+<td>天王寺 / 大阪</td>
+<td>~50–70 分</td>
+<td>¥1,210 起</td>
+<td>搭配 ICOCA / JR Pass 適合</td>
+</tr>
+<tr>
+<td>HARUKA 特急</td>
+<td>天王寺 / 新大阪 / 京都</td>
+<td>~30–80 分</td>
+<td>視區段</td>
+<td>要去京都很順</td>
+</tr>
+<tr>
+<td>利木津巴士</td>
+<td>梅田 / 難波 / USJ</td>
+<td>~50–60 分</td>
+<td>¥1,800</td>
+<td>大行李省力</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>市內交通</h2>
+<h3>IC 卡</h3>
+<ul>
+<li>ICOCA（JR 西日本系列）：機場 JR 售票處可買，全國通用</li>
+<li>或 PASMO / Suica（如果有從東京帶來）</li>
+</ul>
+<h3>周遊券候選</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>票券</th>
+<th>涵蓋</th>
+<th>價格</th>
+<th>適合情境</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大阪周遊卡 1 日 / 2 日</td>
+<td>大阪市內地鐵 + 多景點免費入場</td>
+<td>¥2,800 / ¥3,600</td>
+<td>大阪市內 packed day</td>
+</tr>
+<tr>
+<td>關西周遊卡 KTP 2 日 / 3 日</td>
+<td>關西私鐵 + 巴士（不含 JR）</td>
+<td>¥5,600 / ¥7,000</td>
+<td>跨京都 / 奈良 / 神戶</td>
+</tr>
+<tr>
+<td>JR 關西地區 Pass 1–4 日</td>
+<td>JR 西日本 + HARUKA</td>
+<td>視天數</td>
+<td>跨城市且偏好 JR</td>
+</tr>
+<tr>
+<td>阪急 1 日券 / 阪神 1 日券</td>
+<td>對應私鐵</td>
+<td>~¥700</td>
+<td>特定路線</td>
+</tr>
+</tbody>
+</table></div>
+<h3>日票評估：6/17–6/20（2026/06 核價）</h3>
+<blockquote>
+<p><strong>結論：6/17–6/20 四天都不需要日票，全程刷 Suica（=ICOCA）逐段付最省。</strong> 唯一例外是 6/19 比叡山的纜車/索道/山上巴士（不收 IC、現場付現金/紙票）。</p>
+</blockquote>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>日期</th>
+<th>主要區段</th>
+<th>IC 實付</th>
+<th>日票選項</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6/17（三）大阪</td>
+<td>南海空港急行 ¥970 +（市內）阪堺 ×2 ¥480 + Metro 1 站 ¥190</td>
+<td>市內 ¥670（含機場 ¥1,640）</td>
+<td>阪堺てくてく ¥700（3 趟才回本）/ Osaka Metro エンジョイエコ 平日 ¥820（只搭 1 趟）</td>
+<td>❌ 刷 Suica</td>
+</tr>
+<tr>
+<td>6/18（四）奈良+移京都</td>
+<td>Metro ¥190 + 近鉄なんば→奈良 ¥680 + 近鉄/京阪 奈良→祇園四条 ~¥1,000</td>
+<td>~¥1,870</td>
+<td>私鐵長距離點對點，無對應划算日票</td>
+<td>❌ 刷 Suica</td>
+</tr>
+<tr>
+<td>6/19（五）比叡山</td>
+<td>見 <code>行程-0619</code> 票券評估</td>
+<td>¥6,540–7,670（含門票/餐）</td>
+<td>套票皆較貴（已分析）</td>
+<td>❌ 單買最省</td>
+</tr>
+<tr>
+<td>6/20（六）京都東山</td>
+<td>京阪 ¥220+¥150 + 市バス ¥230</td>
+<td>~¥600</td>
+<td>京都地下鉄・バス一日券 ¥1,100（市バス單獨券已於 2023/9 廢止）</td>
+<td>❌ 刷 Suica</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>關西周遊券（KTP）整段評估</strong>：2 日 ¥5,600 / 3 日 ¥7,000，涵蓋私鐵+地鐵+市巴士（<strong>不含 JR、不含纜車/索道</strong>）。這四天可涵蓋的私鐵車資總和約 ¥5,570／4 天，買不回本，且比叡山纜車不含 → <strong>不需要</strong>。</p>
+<p><strong>行動</strong>：出發前把 Suica 餘額儲足（建議含這幾天市內交通至少 ¥5,000–6,000）。</p>
+<p>⚠️ 票價更新（2026/05）：阪堺電車均一已從 ¥230 漲到 <strong>¥240</strong>。</p>
+<p>來源：<a href="https://www.otokukippu.xyz/archives/14203">阪堺電車 1日乗車券・運賃</a>、<a href="https://subway.osakametro.co.jp/guide/page/enjoy-eco.php">Osaka Metro エンジョイエコカード</a>、<a href="https://tabiris.com/archives/kyoto-bus-neage/">京都市 地下鉄・バス一日券</a></p>
+</blockquote>
+<h3>附錄：關西常見交通日票全景（2026 參考）</h3>
+<blockquote>
+<p>行程變動時回查用。標 ⚠️ 信心較低、購買前再確認；🛂 = 限訪日客（需出示護照）。本趟 6/17–6/20 經試算皆刷 Suica 最省，以下不需購買。</p>
+</blockquote>
+<p><strong>大阪市內</strong></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>票券</th>
+<th>價格</th>
+<th>涵蓋</th>
+<th>適合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Osaka Metro エンジョイエコカード</td>
+<td>平日 ¥820 / 假日 ¥620</td>
+<td>Metro 全線 + 大阪 City Bus</td>
+<td>市內密集移動日（假日 3 趟回本）</td>
+</tr>
+<tr>
+<td>大阪周遊パス（Amazing Pass）</td>
+<td>1 日 ¥3,500 / 2 日 ¥5,000</td>
+<td>Metro + 部分私鐵 + 約 40 景點免費入場</td>
+<td>一天衝多個收費景點才划算</td>
+</tr>
+<tr>
+<td>大阪周遊パス 伊丹空港版</td>
+<td>1 日 ¥3,800 / 2 日 ¥5,400</td>
+<td>上者 + 大阪單軌 + 北大阪急行</td>
+<td>從伊丹進出</td>
+</tr>
+<tr>
+<td>阪堺電車 てくてくきっぷ</td>
+<td>¥700</td>
+<td>阪堺全線</td>
+<td>搭 3 趟以上才回本</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>京都市內</strong></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>票券</th>
+<th>價格</th>
+<th>涵蓋</th>
+<th>適合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>地下鉄・バス一日券</td>
+<td>¥1,100</td>
+<td>京都地鐵 + 市巴士（+部分私鐵巴士）</td>
+<td>巴士為主日（5 趟回本）</td>
+</tr>
+<tr>
+<td>地下鉄一日券</td>
+<td>¥800</td>
+<td>京都地鐵全線</td>
+<td>只搭地鐵</td>
+</tr>
+<tr>
+<td>嵐電一日フリーきっぷ</td>
+<td>⚠️ ~¥700</td>
+<td>京福嵐山本線 + 北野線</td>
+<td>嵐電沿線多站（季節聯票另有 ¥1,700 版）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>註：京都「市バス單獨一日券 ¥700」已於 2023/9 廢止，現僅存上面共通券。</p>
+</blockquote>
+<p><strong>私鐵各社一日券（單一公司全線）</strong></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>票券</th>
+<th>價格</th>
+<th>涵蓋</th>
+<th>適合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>阪急 1day Pass</td>
+<td>~¥700</td>
+<td>阪急全線（大阪—京都—神戶）</td>
+<td>一天跨阪急三都</td>
+</tr>
+<tr>
+<td>阪神 1day Ticket</td>
+<td>~¥500</td>
+<td>阪神全線（大阪—神戶）</td>
+<td>阪神沿線</td>
+</tr>
+<tr>
+<td>京阪 京都觀光一日券</td>
+<td>⚠️ 京都版 ~¥700 / 含大阪 ~¥1,000</td>
+<td>京阪電車</td>
+<td>京阪沿線（伏見稻荷/宇治/出町柳）多站</td>
+</tr>
+<tr>
+<td>近鉄 1day/2day Pass</td>
+<td>視版本</td>
+<td>近鉄全線</td>
+<td>跨區長距離（奈良/京都/伊勢）</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>跨區・廣域（多為 🛂 限訪日客）</strong></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>票券</th>
+<th>價格</th>
+<th>涵蓋</th>
+<th>重點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KANSAI RAILWAY PASS（原 Kansai Thru Pass，現 Lite）🛂</td>
+<td>2 日 ~¥5,300 / 3 日 ~¥6,500</td>
+<td>關西私鐵+地鐵+巴士（❌ 不含 JR、❌ 已不含京都地鐵與大津京阪）</td>
+<td>可非連續日使用</td>
+</tr>
+<tr>
+<td>JR 関西エリアパス 🛂</td>
+<td>⚠️ 1–4 日（約 ¥2,800–7,000）</td>
+<td>JR 西日本關西區 + HARUKA</td>
+<td>偏好 JR、機場用 HARUKA</td>
+</tr>
+<tr>
+<td>JR 西日本 QR 2day パス</td>
+<td>¥4,000</td>
+<td>關西區 JR 普通/快速 2 日</td>
+<td>QR 票、無國籍限制</td>
+</tr>
+<tr>
+<td>関西ワイドエリアパス 🛂</td>
+<td>5 日（較高）</td>
+<td>含新幹線到岡山、城崎、白濱</td>
+<td>跨遠程大區</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>特定路線（本趟相關）</strong></p>
+<ul>
+<li>比叡山フリーパス（デジタル）¥3,500 — 6/19 已分析：單買 ¥3,340 更省，不買。</li>
+<li>奈良斑鳩 1day（近鉄+奈良交通巴士）— 6/18 純走奈良公園步行圈，用不到。</li>
+</ul>
+<blockquote>
+<p>來源：<a href="https://subway.osakametro.co.jp/guide/page/20260401_osaka_amazing_pass.php">大阪周遊パス</a>、<a href="https://www.japan-guide.com/e/e2357_005.html">KANSAI RAILWAY PASS</a>、<a href="https://japan-transportation.com/archives/23718">JR QR 2day パス</a>、<a href="https://www.otokukippu.xyz/archives/4469">嵐電一日フリーきっぷ</a></p>
+</blockquote>
+<hr>
+<h2>跨城市交通</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>路線</th>
+<th>推薦方式</th>
+<th>時間</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>大阪 ↔ 京都</td>
+<td>JR 新快速 / 阪急 / 京阪</td>
+<td>30–45 分</td>
+<td>看住宿位置</td>
+</tr>
+<tr>
+<td>大阪 ↔ 奈良</td>
+<td>近鐵 / JR 大和路快速</td>
+<td>~35–50 分</td>
+<td>近鐵到「近鐵奈良」較近東大寺</td>
+</tr>
+<tr>
+<td>大阪 ↔ 神戶</td>
+<td>JR 新快速 / 阪神 / 阪急</td>
+<td>~25–40 分</td>
+<td></td>
+</tr>
+<tr>
+<td>大阪 ↔ 姬路</td>
+<td>JR 新快速</td>
+<td>~60 分</td>
+<td>看姬路城用</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>行李</h2>
+<ul>
+<li>寄物：車站 coin locker、Ecbo Cloak</li>
+<li>機場 ↔ 飯店宅配：Yamato 黑貓</li>
+</ul>
+</section>
+<section id="s11">
+<h1>02 - 住宿</h1>
+<blockquote>
+<p>本檔記錄：訂房通路速查 → 每晚住哪一覽 → ✅ 已訂飯店（詳細）→ 🔍 尚未預訂。</p>
+</blockquote>
+<h2>📌 訂房通路速查（已訂 4 間）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>飯店</th>
+<th>訂房通路</th>
+<th>付款</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The OneFive Osaka Shinsekai（新世界、6/17–18）</td>
+<td><strong>Agoda</strong></td>
+<td>USD 21.26（~TWD 670）、6/12 以 TWD 自動扣款（卡末四碼 7704）</td>
+</tr>
+<tr>
+<td>樂天 STAY URBAN 四條河原町（6/18–20）</td>
+<td><strong>Agoda</strong></td>
+<td>JPY 11,524、6/13 以 TWD 自動扣款（幸福 M 卡）</td>
+</tr>
+<tr>
+<td>Sekia Wagaya Hotel（6/20–21）</td>
+<td><strong>Booking.com</strong></td>
+<td>JPY 4,500、現場付現</td>
+</tr>
+<tr>
+<td>相鐵 Grand Fresa（<strong>6/21–24</strong>）</td>
+<td><strong>Booking.com</strong></td>
+<td>TWD 3,637（¥18,492、3 晚）、💳 6/17 收費（Mastercard 7704）、6/20 前免費取消</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>🗓 每晚住哪（7 晚一覽）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>晚</th>
+<th>日期</th>
+<th>城市</th>
+<th>住宿</th>
+<th>狀態</th>
+<th>訂房網站</th>
+<th>價格 / 付款（整段）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>6/17（三）</td>
+<td>大阪</td>
+<td>The OneFive Osaka Shinsekai（新世界）</td>
+<td>✅</td>
+<td>Agoda</td>
+<td>USD 21.26（~TWD 670）｜💳 信用卡、<strong>6/12 自動扣款</strong>（卡末 7704）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>6/18（四）</td>
+<td>京都</td>
+<td>樂天 STAY URBAN 四條河原町</td>
+<td>✅</td>
+<td>Agoda</td>
+<td>JPY 11,524（2 晚、~TWD 2,520）｜💳 信用卡、<strong>6/13 自動扣款</strong>（幸福 M 卡）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>6/19（五）</td>
+<td>京都</td>
+<td>樂天 STAY URBAN 四條河原町</td>
+<td>✅</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>6/20（六）</td>
+<td>京都</td>
+<td>Sekia Wagaya Hotel</td>
+<td>✅</td>
+<td>Booking.com</td>
+<td>JPY 4,500（~TWD 970）｜💵 <strong>現場付現</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>6/21（日）</td>
+<td>大阪</td>
+<td>相鐵 Grand Fresa</td>
+<td>✅</td>
+<td>Booking.com</td>
+<td>TWD 3,637（3 晚、¥18,492）｜💳 信用卡 Mastercard 7704、<strong>6/17 收費</strong>、6/20 前免費取消</td>
+</tr>
+<tr>
+<td>6</td>
+<td>6/22（一）</td>
+<td>大阪</td>
+<td>相鐵 Grand Fresa</td>
+<td>✅</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>6/23（二）</td>
+<td>大阪</td>
+<td>相鐵 Grand Fresa</td>
+<td>✅</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>6/24（三）為出發日，無住宿。
+<strong>7 晚全數訂齊</strong>。詳細訂房資訊見下方「✅ 已訂飯店」。</p>
+</blockquote>
+<hr>
+<h2>✅ 已訂飯店（4 間）</h2>
+<h3>大阪段（抵達夜）：The OneFive Osaka Shinsekai（大阪新世界一五飯店）</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>入住</strong></td>
+<td>2026/6/17（週三）</td>
+</tr>
+<tr>
+<td><strong>退房</strong></td>
+<td>2026/6/18（週四）</td>
+</tr>
+<tr>
+<td><strong>晚數</strong></td>
+<td>1 晚</td>
+</tr>
+<tr>
+<td><strong>位置</strong></td>
+<td>大阪市浪速區恵美須東 2-1-24（<strong>新世界</strong>、通天閣旁）</td>
+</tr>
+<tr>
+<td><strong>交通</strong></td>
+<td>地下鐵 動物園前駅 1 號出口 徒步 4 分 / 南海・JR 新今宮駅 通天閣口 徒步 6 分 / 恵美須町（阪堺電車・堺筋線）近</td>
+</tr>
+<tr>
+<td><strong>動線</strong></td>
+<td>KIX → 南海 新今宮 直達（空港急行 ¥970 刷 Suica）→ 徒步 6 分；串カツ・通天閣在門口；6/18 JR 新今宮 → 奈良 直達</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>訂房資訊</strong>：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>訂房通路</strong></td>
+<td>Agoda</td>
+</tr>
+<tr>
+<td><strong>房費總額</strong></td>
+<td><strong>USD 21.26</strong>（房 16.80 + 稅 4.46、1 晚、~TWD 670）</td>
+</tr>
+<tr>
+<td><strong>付款日</strong></td>
+<td>2026/6/12（五）以 TWD 自動扣款</td>
+</tr>
+<tr>
+<td><strong>付款卡</strong></td>
+<td>末四碼 7704</td>
+</tr>
+<tr>
+<td><strong>附加費</strong></td>
+<td>城市住宿稅入住時現場收</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>對應行程</strong>：
+- 6/17（三）抵達日進大阪 + 下午 / 晚上（南大阪、見 <code>行程-0617-抵達日.md</code>）
+- 6/18（四）一早 JR 新今宮 → 奈良一日 → 晚移京都樂天</p>
+<hr>
+<h3>京都段（前段）：樂天 STAY URBAN 四條河原町（Rakuten STAY URBAN Shijo Kawaramachi）</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>入住</strong></td>
+<td>2026/6/18（週四）15:00</td>
+</tr>
+<tr>
+<td><strong>退房</strong></td>
+<td>2026/6/20（週六）11:00</td>
+</tr>
+<tr>
+<td><strong>晚數</strong></td>
+<td>2 晚</td>
+</tr>
+<tr>
+<td><strong>位置</strong></td>
+<td>河原町通 松原上 二丁目富永町、京都市下京區</td>
+</tr>
+<tr>
+<td><strong>舊名</strong></td>
+<td>Hotel Meldia Shijo Kawaramachi（2026/3 後改名）</td>
+</tr>
+<tr>
+<td><strong>交通</strong></td>
+<td>阪急京都河原町 5–7 分 / 京阪祇園四条 9 分 / 京阪清水五條 10 分</td>
+</tr>
+<tr>
+<td><strong>夜生活</strong></td>
+<td>河原町通 3 分 / 木屋町 / 先斗町 5–10 分 / 鴨川 5 分</td>
+</tr>
+<tr>
+<td><strong>評分</strong></td>
+<td>8.7</td>
+</tr>
+<tr>
+<td><strong>房型</strong></td>
+<td>自助式公寓（無人櫃台、self check-in）</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>訂房資訊</strong>：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>訂房通路</strong></td>
+<td>Agoda</td>
+</tr>
+<tr>
+<td><strong>房費總額</strong></td>
+<td><strong>JPY 11,524</strong>（2 晚、平均 ¥5,762 / 晚）</td>
+</tr>
+<tr>
+<td><strong>付款日</strong></td>
+<td>2026/6/13（六）以 TWD 自動扣款</td>
+</tr>
+<tr>
+<td><strong>付款卡</strong></td>
+<td>幸福 M 卡</td>
+</tr>
+<tr>
+<td><strong>附加費</strong></td>
+<td>¥400 到店付現金</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>對應行程</strong>：
+- 6/18（四）抵京都 + 奈良一日後晚住
+- 6/19（五）比叡山日
+- 6/20（六）京都東山日 → 退房 → 移大阪</p>
+<hr>
+<h3>京都段（中段）：Sekia Wagaya Hotel（舊名 Noga Hotel）</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>入住</strong></td>
+<td>2026/6/20（週六）</td>
+</tr>
+<tr>
+<td><strong>退房</strong></td>
+<td>2026/6/21（週日）</td>
+</tr>
+<tr>
+<td><strong>晚數</strong></td>
+<td>1 晚</td>
+</tr>
+<tr>
+<td><strong>位置</strong></td>
+<td>京都府京都市下京區西七條掛越町 40-1</td>
+</tr>
+<tr>
+<td><strong>距離</strong></td>
+<td>京都駅 西邊（巴士直達）/ 京都鐵博 步行 ~15 分 ⭐ / 河原町 ~3.5 km</td>
+</tr>
+<tr>
+<td><strong>特色</strong></td>
+<td>22 間客房、家庭房、有小廚房、近大型超市 + Starbucks</td>
+</tr>
+<tr>
+<td><strong>評分</strong></td>
+<td>8.6</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>訂房資訊</strong>：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>訂房通路</strong></td>
+<td>Booking.com</td>
+</tr>
+<tr>
+<td><strong>房費總額</strong></td>
+<td><strong>JPY 4,500</strong>（1 晚）</td>
+</tr>
+<tr>
+<td><strong>付款</strong></td>
+<td>現場付現金</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>對應行程</strong>：
+- 6/20（六）京都東山日 → 樂天 STAY URBAN 退房（11:00）→ 寄物 → 跑東山 → 晚轉到 Sekia Wagaya check-in
+- 6/21（日）退房 → 嵐山（早上）+ 京都鐵博（下午）→ 移大阪相鐵 Grand Fresa</p>
+<hr>
+<h3>大阪段（後段）：大阪難波相鐵 Grand Fresa（Sotetsu Grand Fresa Osaka-Namba）</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>入住</strong></td>
+<td>2026/6/21（週日）15:00~23:30</td>
+</tr>
+<tr>
+<td><strong>退房</strong></td>
+<td>2026/6/24（週三）11:00 前</td>
+</tr>
+<tr>
+<td><strong>晚數</strong></td>
+<td>3 晚</td>
+</tr>
+<tr>
+<td><strong>位置</strong></td>
+<td>大阪市中央區日本橋 1-1-13（近 日本橋駅、<strong>黑門市場旁</strong>）</td>
+</tr>
+<tr>
+<td><strong>交通</strong></td>
+<td>地下鐵 日本橋駅 近 / 難波 ~5–8 分（地鐵 + 南海 + 近鐵 + JR）</td>
+</tr>
+<tr>
+<td><strong>動線</strong></td>
+<td>黑門市場 旁 / 道頓堀 ~5 分 / 心齋橋 ~10 分 / 6/24 經難波 → Rapi:t → KIX</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>訂房資訊</strong>：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>訂房通路</strong></td>
+<td>Booking.com（原 易遊網 ezTravel 2 晚已取消、改訂 3 晚）</td>
+</tr>
+<tr>
+<td><strong>房費總額</strong></td>
+<td><strong>TWD 3,637</strong>（3 晚、¥18,492）</td>
+</tr>
+<tr>
+<td><strong>付款 / 取消</strong></td>
+<td>💳 Mastercard（末四碼 7704）、Booking.com 於 <strong>2026/6/17 收費</strong> ¥18,492；<strong>6/20 前（不含當日）免費取消</strong>（交易 6/9 建立）</td>
+</tr>
+<tr>
+<td><strong>附加費</strong></td>
+<td>大阪市住宿稅 現場收（依房價）</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>對應行程</strong>：
+- 6/21（日）嵐山 + 鐵博日 → 晚移大阪、入住相鐵（連住起點、省一次行李移動）
+- 6/22（一）跨城市 day trip 後晚回飯店
+- 6/23（二）大阪南區一日（大阪城 + 黑門 + 心齋橋購物 + 道頓堀晚餐）
+- 6/24（三）退房 → 走到難波駅 → 17:30 Rapi:t → 18:07 KIX → 20:55 起飛</p>
+<hr>
+<h2>✅ 住宿全數訂齊</h2>
+<blockquote>
+<p>7 晚（6/17–24）全部已訂，<strong>無待訂項目</strong>。明細見上方「每晚住哪一覽」與「已訂飯店」。</p>
+</blockquote>
+</section>
+<section id="s12">
+<h1>03 - 景點</h1>
+<p>候選清單先鋪開，最後階段再排進每日行程。</p>
+<blockquote>
+<p><strong>偏好註記</strong>：1 人男性、<strong>不愛購物逛街</strong>（不買東西）→ 純商圈、百貨、商店街權重降低
+<strong>體力註記</strong>：拚早去晚回、不安排休息日（單人獨旅 mode）
+<strong>收集原則</strong>：<strong>先廣後深</strong> — 列到看起來「絕對跑不完」為止，最後階段才安排日程順序並篩出實際要去的
+<strong>圖例</strong>：✅ 確認列入 ｜ 🔍 候選中 ｜ ⏬ 優先級低（路過順遊可、不專程）｜ ❌ 確認不去
+<strong>章節劃分</strong>：依「以哪個基地出發較順」分為三章，作為住宿位置決策參考</p>
+</blockquote>
+<hr>
+<h2>✅ 已確認景點總表（12 個）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>景點</th>
+<th>章節</th>
+<th>預估時間</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>大阪城 + 西之丸庭園</strong></td>
+<td>大阪</td>
+<td>2–3h</td>
+<td>6 月紫陽花季、¥600</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>清水寺 / 二三年坂</strong></td>
+<td>京都</td>
+<td>2–3h</td>
+<td>¥400、iconic 必訪</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>京都鐵道博物館</strong></td>
+<td>京都</td>
+<td>半天起</td>
+<td>¥1,500、雨天王牌、鐵道迷必訪</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>比叡山一日穿越</strong>（順時針繞圈鐵道日）</td>
+<td>京都</td>
+<td>1 天</td>
+<td><strong>07:00 出門 / ~15:00 回京都</strong>。叡山ケーブル↑ → 延曆寺 → 坂本ケーブル↓（日本最長 2,025m）→ 穴太衆石垣街 → 京阪石山坂本線 → 濱大津 → <strong>京阪京津線直通京都地下鐵</strong>（路面 + 急坡 + 地鐵直通三合一）</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>阪堺電車</strong>（路面電車）</td>
+<td>大阪</td>
+<td>一日券 ¥700</td>
+<td><strong>順路性質</strong>：排到天王寺 / 住吉大社 / 堺再順遊</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>京福電鐵嵐電</strong>（路面電車）</td>
+<td>京都</td>
+<td>隨行</td>
+<td><strong>順路性質</strong>：排到嵐山時搭</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>道頓堀 / 心齋橋</strong></td>
+<td>大阪</td>
+<td>半天</td>
+<td><strong>當晚餐用</strong>、Glico、戎橋、Curse of the Colonel 現場</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>黑門市場</strong></td>
+<td>大阪</td>
+<td>1–2h</td>
+<td><strong>當某天午餐用</strong>、海鮮 / 和牛串、雨天王牌</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>奈良一日（餵鹿）</strong></td>
+<td>奈良</td>
+<td>1 天</td>
+<td>主軸：奈良公園餵鹿；順遊：東大寺、春日大社、興福寺、奈良町</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>伏見稻荷大社</strong></td>
+<td>京都</td>
+<td>2–3h</td>
+<td><strong>早上去</strong>、千本鳥居、免費 + 24h、JR 稻荷站直達</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>嵐山一帶</strong></td>
+<td>京都</td>
+<td>半–1 天</td>
+<td>渡月橋 + 竹林 + 天龍寺、嵐電已選、可加嵯峨野小火車</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>祇園 / 花見小路</strong></td>
+<td>京都</td>
+<td>1–2h</td>
+<td>清水寺隔壁順遊、藝伎街、八坂神社</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h1>🟥 大阪章</h1>
+<blockquote>
+<p>包含大阪市區（4 確認）+ 從大阪出發較順的跨城市候選（神戶 / 姬路 / 高野山 / 和歌山）</p>
+</blockquote>
+<h2>大阪市內</h2>
+<h3>經典 / 必訪</h3>
+<ul>
+<li>✅ 大阪城 + 西之丸庭園 | 中央區 | 2–3h | ¥600 | 6 月紫陽花</li>
+<li>✅ 道頓堀 / 心齋橋 | 中央區 | 半天 | 免費 | <strong>當晚餐用</strong>、Glico、戎橋、Curse of the Colonel</li>
+<li>✅ 黑門市場 | 中央區 | 1–2h | 免費 | <strong>當某天午餐用</strong>、海鮮 / 和牛串、雨天王牌</li>
+<li>✅ 阪堺電車 | 大阪南 | 一日券 ¥700 | 順路天王寺 / 住吉大社 / 堺</li>
+<li>🔍 通天閣 / 新世界 | 浪速區 | 1–2h | ¥900 起 | 串炸街、昭和氛圍、阪堺電車起點</li>
+</ul>
+<h3>文青 / 漫步</h3>
+<ul>
+<li>🔍 中崎町 | 北區 | 半天 | 老屋咖啡廳、選物店</li>
+<li>🔍 福島 | 福島區 | 一晚 | 居酒屋密集區</li>
+<li>🔍 中之島公園（玫瑰園 / 中央公會堂）| 北區 | 1–2h | 免費</li>
+<li>⏬ 天神橋筋商店街 | 北區 | - | 日本最長商店街（不買東西價值低）</li>
+</ul>
+<h3>主題 / 場館</h3>
+<ul>
+<li>🔍 海遊館 | 港區 | 2–3h | ¥2,400 | 雨天備案</li>
+<li>⏬ EXPOCITY / 萬博紀念公園 | 吹田市 | 半天 | 太陽之塔</li>
+</ul>
+<h2>大阪・西邊跨城市候選 — 神戶 / 姬路</h2>
+<blockquote>
+<p>從大阪出發：三宮 ~25 分、姬路 ~60 分</p>
+</blockquote>
+<ul>
+<li>🔍 姬路城 + 好古園 | 半天 | ¥1,000 + ¥310 | <strong>國寶 4 城天守之一</strong>、現存最美白鷺城、世界遺產</li>
+<li>🔍 北野異人館街 | 神戶山手 | 半天 | 山手洋館</li>
+<li>🔍 摩耶山 / 六甲山夜景 | 神戶北 | 半天 | <strong>日本三大夜景</strong></li>
+<li>🔍 有馬溫泉 | 神戶北 | 半天–一晚 | <strong>日本最古老溫泉之一</strong></li>
+<li>⏬ 元町中華街（南京町）| 神戶 | 順遊</li>
+<li>⏬ 神戶港 / Harborland | 神戶 | 傍晚順遊</li>
+</ul>
+<h2>大阪・南邊跨城市候選 — 高野山 / 和歌山</h2>
+<blockquote>
+<p>從大阪難波（南海）→ 高野山 ~1.5h</p>
+</blockquote>
+<ul>
+<li>🔍 高野山（弘法大師聖地、奧之院）| 1 天 / 宿坊一晚 | 山岳鐵道 + 纜車氛圍</li>
+<li>🔍 和歌山（黑潮市場 / 白濱）| 深度路線</li>
+<li>❌ 城崎溫泉（太遠、6 月不適合）</li>
+</ul>
+<h2>大阪相關鐵道體驗</h2>
+<ul>
+<li>✅ 阪堺電車（同上）</li>
+<li>🔍 <strong>福知山線廢線徒步</strong>（生瀨〜武田尾）| 兵庫西宮北 | 半天 | 自備手電筒</li>
+<li>🔍 <strong>南海 Rapi:t</strong>（藍色機場特急）| 回程從難波 → KIX 順便搭</li>
+<li>🔍 <strong>近鐵「青の交響曲」</strong> | 大阪阿部野橋 → 吉野 | 預約制觀光特急</li>
+<li>🔍 <strong>山陽電鐵直通特急</strong> | 阪神梅田 → 姬路 | 普通票就能搭</li>
+<li>⏬ JR 西網干総合車両所（姬路）| 6 月應無開放日，須查</li>
+</ul>
+<h2>大阪剔除</h2>
+<ul>
+<li>❌ 環球影城 USJ | 太貴 + 獨旅不適合（一日 ¥10,400+ Express ¥7,800–18,000）</li>
+<li>❌ 阿倍野 HARUKAS 展望台 | 跟晴空塔 / 東京鐵塔同類，沒興趣</li>
+<li>❌ 梅田藍天大廈空中庭園 | 已去過晴空塔 / 東京鐵塔，類型重複</li>
+<li>❌ 日本橋電器街 / 動漫店 | 不採購、興趣不高</li>
+</ul>
+<hr>
+<h1>🟧 京都章</h1>
+<blockquote>
+<p>包含京都市內（6 確認）+ 比叡山一日（跨京都/滋賀）+ 滋賀 / 琵琶湖（從京都出發較順）+ 京都進階候選</p>
+</blockquote>
+<h2>京都市內</h2>
+<h3>經典寺廟神社</h3>
+<ul>
+<li>✅ 清水寺 / 二三年坂 | 東山 | 2–3h | ¥400 | iconic 必訪</li>
+<li>✅ 伏見稻荷大社 | 伏見 | 2–3h | 免費 | 千本鳥居、<strong>早上去 / 清晨最美</strong></li>
+<li>✅ 嵐山（渡月橋 + 竹林 + 天龍寺）| 嵐山 | 半–1 天 | 天龍寺 ¥500</li>
+<li>✅ 祇園 / 花見小路 | 東山 | 1–2h | 免費 | 清水寺隔壁順遊、八坂神社、夜晚氛圍佳</li>
+</ul>
+<h3>京都進階候選</h3>
+<ul>
+<li>🔍 金閣寺 | 北山 | 1h | ¥500 | iconic 但停留短</li>
+<li>🔍 銀閣寺 + 哲學之道 | 東山北 | 2–3h | ¥500 | 6 月紫陽花、文青漫步</li>
+<li>🔍 二条城 | 中京 | 2h | ¥1,300 | 德川家城堡、鶯張地板</li>
+<li>🔍 京都御所 | 上京區 | 1.5–2h | 免費 | 天皇舊皇居、跟二条城類型相近建議二選一</li>
+<li>🔍 三千院 / 大原 | 北郊 | 半天 | 較遠</li>
+<li>🔍 宇治（平等院、抹茶）| 宇治 | 半天 | 京都–奈良中間</li>
+</ul>
+<h2>比叡山一日穿越（跨京都 / 滋賀）</h2>
+<h3>一日內已確認</h3>
+<ul>
+<li>✅ <strong>比叡山延曆寺</strong>（山頂）| 一日主軸</li>
+<li>✅ <strong>叡山ケーブル</strong>（京都端上山）</li>
+<li>✅ <strong>坂本ケーブル</strong>（日本最長纜車 2,025 m）| 滋賀坂本下山</li>
+<li>✅ <strong>穴太衆石垣街</strong>（坂本舊町、重伝建保存區）| 從纜車站步行到京阪站路過、免費</li>
+<li>✅ <strong>京阪京津線</strong>（路面電車 + 60‰ 急坡 + 直通京都地下鐵）| 鐵道奇景回程</li>
+</ul>
+<h3>一日「順便停一下」候選（當日視時間 / 體力 / 天氣決定）</h3>
+<blockquote>
+<p>全部都「在路上」，不需要專程繞遠。</p>
+</blockquote>
+<ul>
+<li>🔍 <strong>舊竹林院</strong>（庭園 + 抹茶）| 石垣街內 | ¥330 + ¥500 抹茶 | 30–40 分</li>
+<li>🔍 <strong>日吉大社</strong> | 略繞道 | ¥300 | 全國山王神社總本宮</li>
+<li>🔍 <strong>濱大津湖岸散步</strong>（なぎさ公園）| 京阪濱大津出來 3 分 | 免費 | 30 分–1h</li>
+<li>❌ <strong>ミシガン號遊覽船</strong> | 不考慮（船活動非優先）</li>
+</ul>
+<h2>滋賀 / 琵琶湖（另排一日候選）</h2>
+<blockquote>
+<p>比叡山一日不會繞過去的，要去就另排一日，從京都出發較順。</p>
+</blockquote>
+<h3>湖東（從京都 ~35–50 分）</h3>
+<ul>
+<li>🔍 <strong>彥根城 + 玄宮園</strong> | 半天–1 天 | ¥1,000 | <strong>國寶 4 城天守之一</strong>、井伊家</li>
+<li>🔍 <strong>長濱黑壁廣場</strong> | 半天 | 明治玻璃老街、豐臣秀吉首座城下町</li>
+<li>🔍 <strong>近江八幡 八幡堀</strong> | 半天 | 水鄉運河、時代劇取景地</li>
+<li>🔍 <strong>安土城跡</strong> | 半天 | <strong>織田信長</strong>居城遺跡、戰國迷朝聖</li>
+<li>🔍 <strong>多賀大社</strong> | 1.5h | 長壽神社、近江鐵道延伸</li>
+<li>🔍 <strong>草津宿本陣</strong> | 1h | 中山道 + 東海道交會、宿場町</li>
+</ul>
+<h3>湖西（從京都 50–75 分，沿 JR 湖西線）</h3>
+<ul>
+<li>🔍 <strong>白鬚神社</strong> | 1h | <strong>湖中鳥居</strong>、近江的嚴島、IG 取向</li>
+<li>🔍 メタセコイア並木道（高島）| 1.5h | 2.4 km 柳杉並木、日本百選</li>
+<li>🔍 海津大崎 | 1h | 湖北岸自行車道</li>
+<li>🔍 近江舞子（湖水浴場）| 半天 | 夏天玩水</li>
+</ul>
+<h3>湖南（從京都 10–25 分，較近）</h3>
+<ul>
+<li>🔍 石山寺 | 1.5h | <strong>紫式部寫《源氏物語》之地</strong>、賞月名所</li>
+<li>🔍 三井寺 | 1.5h | 天台寺門宗總本山、近江八景</li>
+<li>🔍 近江神宮 | 1h | 《花牌情緣》動漫朝聖、天智天皇</li>
+<li>🔍 建部大社（瀨田）| 1h | <strong>近江國一之宮</strong></li>
+<li>🔍 瀨田唐橋 | 30 分 | 近江八景「瀨田夕照」</li>
+<li>🔍 滋賀縣立美術館 | 2h | 雨天備案</li>
+</ul>
+<h3>特殊區（深山）</h3>
+<ul>
+<li>🔍 <strong>MIHO 美術館</strong>（信樂町）| 半–1 天 | <strong>貝聿銘設計</strong>、深山中、世界級建築景點。<strong>6 月有展期才開放，需查官網</strong></li>
+<li>🔍 信樂陶器之鄉 | 半天 | 狸貓陶器發源地、信樂高原鐵道地方私鐵</li>
+<li>🔍 竹生島 | 半天 | 寶嚴寺 + 神社、湖中島、長濱港搭船</li>
+</ul>
+<h3>鐵道屬性候選（琵琶湖周邊）</h3>
+<ul>
+<li>🔍 JR 湖西線（沿湖跑、車窗風景）| 京都 → 高島 / 近江舞子</li>
+<li>🔍 近江鐵道（地方私鐵）| 米原↔貴生川 | 復古車輛、鐵道迷小眾</li>
+<li>🔍 信樂高原鐵道 | 草津 → 信樂 | 地方私鐵</li>
+</ul>
+<h2>京都相關鐵道體驗</h2>
+<ul>
+<li>✅ 京都鐵道博物館（同上）| 半天 | ¥1,500</li>
+<li>✅ 京福電鐵嵐電（同上）| 嵐山↔四條大宮 | 順路</li>
+<li>✅ 比叡山一日（叡山ケーブル + 坂本ケーブル + 京阪京津線）| 同上</li>
+<li>🔍 <strong>嵯峨野觀光小火車</strong>（トロッコ）| 嵐山↔龜岡 | ~25 分 | 預約制</li>
+<li>🔍 <strong>叡山電鐵「きらら」「ひえい」</strong> | 出町柳↔鞍馬 / 貴船 | 觀光展望列車</li>
+<li>🔍 <strong>京阪 8000 系雙層特急</strong> | 京都↔大阪淀屋橋 | 不加價</li>
+<li>⏬ 加悦 SL 廣場（京都府北部）| 純鐵道狂熱才值得，太遠</li>
+</ul>
+<hr>
+<h1>🟨 奈良章</h1>
+<blockquote>
+<p>一天行程，從大阪 / 京都都可出發
+大阪難波 → 近鐵奈良 ~40 分；京都 → JR / 近鐵奈良 ~45 分</p>
+</blockquote>
+<h2>奈良一日（主軸：餵鹿）</h2>
+<blockquote>
+<p>全部都在步行 / 短公車距離內，一天可以全跑完。</p>
+</blockquote>
+<ul>
+<li>✅ 奈良公園（餵鹿，主目標）| 全區免費 | 鹿仙貝 ¥200 / 份</li>
+<li>✅ 東大寺（大佛殿）| ¥800 | 必訪、奈良公園正門口</li>
+<li>🔍 春日大社 | 免費（本殿區 ¥700）| 鹿群在參道穿梭</li>
+<li>🔍 興福寺 | ¥800（國寶館）| 從近鐵奈良站走過去就會經過、五重塔</li>
+<li>🔍 奈良町 | 免費 | 老街、咖啡廳、雨天備案</li>
+<li>⏬ 若草山 | - | 體力路線、夏天爬山熱</li>
+<li>❌ 平城宮跡 | - | 較冷門、跳過</li>
+</ul>
+<hr>
+<h1>6 月限定看點（跨章）</h1>
+<h2>紫陽花花期（6 月中下旬正盛 → 6/17–6/24 完美命中）</h2>
+<ul>
+<li>三室戶寺（宇治、京都章）— 關西紫陽花 No.1</li>
+<li>矢田寺（奈良大和郡山、奈良章）</li>
+<li>藤森神社（伏見、京都章）</li>
+<li>長居植物園（大阪南、大阪章）</li>
+</ul>
+<h2>螢火蟲</h2>
+<ul>
+<li>北山緑化植物園（神戶、大阪章）</li>
+<li>源平池（鎌倉？確認）</li>
+<li>貴船神社一帶（京都北、京都章）</li>
+</ul>
+<h2>雨天備案（梅雨王牌）</h2>
+<ul>
+<li>✅ 京都鐵道博物館</li>
+<li>🔍 海遊館（大阪）</li>
+<li>🔍 中之島美術館（大阪）</li>
+<li>🔍 京都國立博物館</li>
+<li>🔍 teamLab Botanical Garden 大阪</li>
+</ul>
+<hr>
+<h1>TODO</h1>
+<ul>
+<li>6/22 跨城市：神戶 / 姬路 / 高野山 / 滋賀東岸 四選一（見 <code>行程-0622-跨城市.md</code>）</li>
+<li>6/18 奈良白天景點順序、6/24 出發日上午半天 待排</li>
+<li>京都進階候選（金閣 / 銀閣 / 二条城 / 御所 / 宇治）→ 目前無空檔、候補（見 <code>99</code> 索引）</li>
+<li>紫陽花：已排大阪城西之丸庭園（6/23）；其餘花期點如有空再加</li>
+</ul>
+</section>
+<section id="s13">
+<h1>04 - 美食</h1>
+<p>格式：<code>店名 | 區域 | 類型 | 預算 | 預約? | 連結 / 備註</code></p>
+<hr>
+<h2>大阪必吃 type</h2>
+<ul>
+<li>章魚燒（道頓堀「赤鬼」、會津屋）</li>
+<li>大阪燒（鶴橋風月、千房、味乃屋）</li>
+<li>串炸（新世界八重勝、ダルマ）</li>
+<li>和牛壽喜燒 / 涮涮鍋（HARAMI、はり重、北むら）</li>
+<li>拉麵（人類みな麺類、金久右衛門、福島大勝軒）</li>
+<li>海鮮丼 / 壽司（黑門市場、本まぐろ大とろや）</li>
+<li>日式洋食（北極星蛋包飯、自由軒咖哩、明治軒）</li>
+<li>烏龍麵（道頓堀今井、釜たけ）</li>
+</ul>
+<hr>
+<h2>預約清單（高優先）</h2>
+<p>需要提前訂的，依「離出發日」倒推：</p>
+<blockquote>
+<p>常見預約管道：官網、Tabelog、TableCheck、OMAKASE、店家 IG/Line、飯店禮賓代訂。
+米其林 / 高需求餐廳通常前 1–3 個月開放。</p>
+</blockquote>
+<hr>
+<h2>京都 / 奈良 / 神戶 美食</h2>
+<h3>京都</h3>
+<ul>
+<li>抹茶（中村藤吉、丸久小山園、伊藤久右衛門）</li>
+<li>京懷石（菊乃井、瓢亭）—— 高預算 + 預約</li>
+<li>蕎麥（権太呂、河道屋）</li>
+<li>錦市場小吃</li>
+</ul>
+<h3>奈良</h3>
+<ul>
+<li>釜飯（志津香）</li>
+<li>鹿せんべい（不算吃但要買來餵鹿）</li>
+<li>中谷堂麻糬（現搗）</li>
+</ul>
+<h3>神戶</h3>
+<ul>
+<li>神戶牛（モーリヤ、Steak Land、和黑）</li>
+<li>中華（南京町）</li>
+<li>麵包（Donq、本高砂屋）</li>
+</ul>
+<hr>
+<h2>居酒屋 / 夜飲</h2>
+<ul>
+<li>福島區一帶</li>
+<li>天滿駅周邊「ザ・大阪サラリーマン的夜飲」</li>
+</ul>
+</section>
+<section id="s14">
+<h1>05 - 購物</h1>
+<hr>
+<h2>區域與店家</h2>
+<h3>藥妝</h3>
+<ul>
+<li>大國藥妝（道頓堀、心齋橋總店）</li>
+<li>Sundrug、Matsumoto Kiyoshi、コスモス</li>
+<li>唐吉訶德 Don Quijote（道頓堀、梅田、難波）</li>
+</ul>
+<h3>電器</h3>
+<ul>
+<li>Yodobashi 梅田（最大）</li>
+<li>BIC CAMERA 難波</li>
+<li>大阪日本橋電器街（含中古 / 動漫）</li>
+</ul>
+<h3>服飾 / 選物</h3>
+<ul>
+<li>心齋橋筋</li>
+<li>阪急梅田本店、阪神梅田、大丸心齋橋、高島屋</li>
+<li>中崎町（古著、選物）</li>
+<li>LUCUA / GRAND FRONT（梅田站直結）</li>
+<li>美國村 / 堀江（潮流）</li>
+</ul>
+<h3>Outlet</h3>
+<ul>
+<li>臨空 Premium Outlets（關空附近，回程可順）</li>
+<li>三井 Outlet Park 大阪鶴見</li>
+</ul>
+<h3>二手 / Vintage</h3>
+<ul>
+<li>BookOff、HARD OFF（中古電器、模型、衣服）</li>
+<li>Kindal、RAGTAG（精品二手）</li>
+<li>Mandarake（動漫、模型）</li>
+</ul>
+<hr>
+<h2>退稅備註</h2>
+<ul>
+<li>滿 ¥5,000（未稅）可退稅</li>
+<li>食品 / 消耗品需現場封袋、不能在日本拆封食用</li>
+<li>需護照</li>
+</ul>
+</section>
+<section id="s15">
+<h1>06 - 行前準備</h1>
+<hr>
+<h2>證件</h2>
+<ul>
+<li class="task"><input type="checkbox" disabled> 護照效期 ≥ 6 個月（出發日起算）</li>
+<li class="task"><input type="checkbox" disabled> 國際駕照（如需租車）</li>
+<li class="task"><input type="checkbox" disabled> 旅遊保險：產險 / 信用卡附加 / 旅平 + 不便險</li>
+<li class="task"><input type="checkbox" disabled> Visit Japan Web 入境登錄（出發前可線上填）</li>
+</ul>
+<hr>
+<h2>網路</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>優點</th>
+<th>缺點</th>
+<th>預估費用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eSIM（Airalo / Saily / Holafly / Ubigi）</td>
+<td>不換卡、即開即用</td>
+<td>部分機型不支援</td>
+<td>NT$200–600 / 5–10 天</td>
+</tr>
+<tr>
+<td>實體 SIM</td>
+<td>便宜、訊號穩</td>
+<td>要換卡</td>
+<td>類似</td>
+</tr>
+<tr>
+<td>機場 WiFi 機</td>
+<td>多人共用划算</td>
+<td>要充電、要還機</td>
+<td>一日 NT$120 起</td>
+</tr>
+<tr>
+<td>漫遊</td>
+<td>最方便</td>
+<td>最貴</td>
+<td>視電信商</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>TODO</strong>：人數超過 2 人，WiFi 機常划算；單人 / 雙人 eSIM 最省事。</p>
+</blockquote>
+<hr>
+<h2>6 月關西天氣與穿搭</h2>
+<ul>
+<li>月均溫 22–27°C，相對濕度高</li>
+<li>6 月上旬入梅（時間每年浮動），雷陣雨多</li>
+<li><strong>打包</strong>：</li>
+<li>輕便雨傘 / 折疊傘 / 防水外套</li>
+<li>透氣速乾衣物</li>
+<li>一件薄長袖 / 薄外套（冷氣車廂）</li>
+<li>走路鞋 + 一雙防水備用</li>
+<li>備用襪子（淋濕替換）</li>
+</ul>
+<hr>
+<h2>打包清單</h2>
+<h3>隨身</h3>
+<ul>
+<li>護照</li>
+<li>信用卡 ×2 + 現金（建議備 ¥30,000–50,000 以上現金）</li>
+<li>手機 + 行動電源（飛機規定 100Wh 以下）</li>
+<li>充電線、轉接頭（日本是 A 型 100V，台灣電器可直接用）</li>
+</ul>
+<h3>託運</h3>
+<ul>
+<li>衣物（每天替換 + 1 套備用）</li>
+<li>盥洗用品（飯店多半提供，可省）</li>
+<li>藥品（個人慢箋、感冒藥、暈車藥、OK 蹦）</li>
+</ul>
+<h3>旅遊小物</h3>
+<ul>
+<li>折疊購物袋 / 行李箱空間（買東西用）</li>
+<li>環保筷</li>
+<li>太陽眼鏡</li>
+<li>防曬</li>
+</ul>
+<hr>
+<h2>訂位倒數時間表</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>距離出發</th>
+<th>待辦</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8–12 週</td>
+<td>機票、熱門飯店、USJ Express、米其林 / 預約難餐廳</td>
+</tr>
+<tr>
+<td>4–6 週</td>
+<td>JR Pass / 周遊券電子券、租車</td>
+</tr>
+<tr>
+<td>2 週</td>
+<td>一般餐廳預約、行程細節、保險</td>
+</tr>
+<tr>
+<td>1 週</td>
+<td>Visit Japan Web、現金兌換、eSIM 購買</td>
+</tr>
+<tr>
+<td>出發前</td>
+<td>印電子票、確認預約、check-in</td>
+</tr>
+</tbody>
+</table></div>
+</section>
+<section id="s16">
+<h1>大阪旅遊計劃 (2026 / 06)</h1>
+<p><strong>一人獨旅　8 天 7 夜　6/17（三）→ 6/24（三）</strong></p>
+<p>資料搜集與整理的工作區，最終會產出一份建議行程 markdown。</p>
+<hr>
+<h2>規劃順序與進度</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>階段</th>
+<th>項目</th>
+<th>狀態</th>
+<th>對應檔案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>機票</td>
+<td>✅ 定案（T'way 去 / AirAsia X 回）</td>
+<td><code>01-交通.md</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>住宿</td>
+<td>✅ 全 7 晚訂齊</td>
+<td><code>02-住宿.md</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>保險</td>
+<td>✅ 已評估（富邦 A 方案堪用）</td>
+<td><code>06-行前準備.md</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>網路（eSIM）</td>
+<td>⏸ 已預選、待購</td>
+<td><code>06-行前準備.md</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>景點 / 每日 day-block</td>
+<td>🔶 6 日定案；6/22 跨城市待拍板、6/24 上午待排</td>
+<td><code>行程-MMDD-*.md</code>、<code>99-最終行程.md</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>收斂最終行程</td>
+<td>🔶 進行中（骨架 + 索引在 <code>99-最終行程.md</code>）</td>
+<td><code>99-最終行程.md</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>檔案索引</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>檔案</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>00-基本資訊.md</code></td>
+<td>日期、人數、預算追蹤、偏好、wishlist</td>
+</tr>
+<tr>
+<td><code>01-交通.md</code></td>
+<td>機票（已定）、關空往返、IC 卡、周遊券</td>
+</tr>
+<tr>
+<td><code>02-住宿.md</code></td>
+<td>已訂 7 晚一覽 + 訂房通路 + 詳細</td>
+</tr>
+<tr>
+<td><code>03-景點.md</code></td>
+<td>景點候選池（大阪 / 京都 / 奈良 / 跨城市）</td>
+</tr>
+<tr>
+<td><code>04-美食.md</code></td>
+<td>必吃 type、預約管道、居酒屋區</td>
+</tr>
+<tr>
+<td><code>05-購物.md</code></td>
+<td>藥妝、電器、服飾（6/23 用）</td>
+</tr>
+<tr>
+<td><code>06-行前準備.md</code></td>
+<td>證件、保險、eSIM/WiFi、天氣、打包</td>
+</tr>
+<tr>
+<td><code>行程-MMDD-*.md</code></td>
+<td>每日 day-block 詳細草稿（0617–0624）</td>
+</tr>
+<tr>
+<td><code>99-最終行程.md</code></td>
+<td>8 天骨架 + day-block 索引</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2>收集原則</h2>
+<ol>
+<li><strong>先廣後深</strong>：每個分類先把候選項目鋪開，最後階段再篩選。</li>
+<li><strong>資料來源</strong>：丟任何東西進來都可以——連結、貼文截圖、朋友推薦、ChatGPT 整理。</li>
+<li><strong>重複沒關係</strong>：同一個景點/餐廳出現在多個來源也丟進來，最後會去重。</li>
+<li><strong>記錄評估</strong>：候選項目附上一兩句「為什麼想去」，最後排行程時會用到。</li>
+</ol>
+</section>
+<p class="built">離線單檔 · 產生於 2026-06-16 18:08</p>
+</main>
+
+<button class="fab" id="today-fab">📅 跳到今天</button>
+<button class="fab" id="top-fab">↑</button>
+
+<script>
+var nav=document.getElementById('nav'), scrim=document.getElementById('scrim');
+function closeNav(){nav.classList.remove('open');scrim.classList.remove('open');}
+document.getElementById('menu').onclick=function(){nav.classList.toggle('open');scrim.classList.toggle('open');};
+scrim.onclick=closeNav;
+nav.addEventListener('click',function(e){if(e.target.tagName==='A')closeNav();});
+
+// 深淺色（記住選擇）
+var root=document.documentElement, tbtn=document.getElementById('theme');
+function applyTheme(t){if(t==='dark'){root.classList.add('dark');tbtn.textContent='☀️';}else{root.classList.remove('dark');tbtn.textContent='🌙';}}
+var saved=localStorage.getItem('theme');
+if(saved)applyTheme(saved);
+else if(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)applyTheme('dark');
+tbtn.onclick=function(){var d=root.classList.toggle('dark');localStorage.setItem('theme',d?'dark':'light');tbtn.textContent=d?'☀️':'🌙';};
+
+// 回到頂端
+var topfab=document.getElementById('top-fab');
+addEventListener('scroll',function(){topfab.style.display=scrollY>600?'block':'none';});
+topfab.onclick=function(){scrollTo({top:0,behavior:'smooth'});};
+
+// 今天：標記導覽列 + 顯示「跳到今天」
+(function(){
+  var d=new Date(), iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var sec=document.querySelector('section[data-date="'+iso+'"]');
+  document.querySelectorAll('nav a[data-date="'+iso+'"]').forEach(function(a){a.classList.add('today');a.textContent='● '+a.textContent;});
+  if(sec){
+    var fab=document.getElementById('today-fab');
+    fab.style.display='block';
+    fab.onclick=function(){sec.scrollIntoView({behavior:'smooth'});};
+  }
+})();
+</script>
 </body>
+</html>
